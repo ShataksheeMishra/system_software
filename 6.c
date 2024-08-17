@@ -1,3 +1,5 @@
+/*Write a program to take input from STDIN and display on STDOUT.
+ Use only read/write system calls. */
 #include<stdio.h>
 #include <fcntl.h>
 #include <unistd.h>

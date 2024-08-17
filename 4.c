@@ -1,3 +1,4 @@
+/*Write a program to open an existing file with read write mode. Try O_EXCL flag also.*/
 #include <stdio.h>
 #include <fcntl.h>
 int main (void){ 
