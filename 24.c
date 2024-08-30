@@ -8,7 +8,7 @@ int main()
 printf("my pid :%d\n",getpid());
 if(!fork()){
 	printf("i am child process\n ");
-	sleep(10);
+	sleep(5);
 	printf(" pid of my parent: %d\n",getppid());
 }
 }
