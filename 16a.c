@@ -18,10 +18,10 @@ lock.l_start=0;
 lock.l_len=0;
 lock.l_pid=getpid();
 printf("before entering cs\n");
-printf("inside cs\n");
+//printf("inside cs\n");
 
 fcntl(fd,F_SETLKW,&lock);
-//printf("inside cs\n");
+printf("inside cs\n");
 rd=read(0,buff,sizeof(buff));
 lseek(fd,1L,SEEK_END);
 wr=write(fd,buff,sizeof(buff));
