@@ -1,3 +1,13 @@
+/*
+============================================================================
+Name : 1a.c
+Author : Shatakshee Mishra
+Description : Create the following types of a files using (i) shell command (ii) system call
+a. soft link (symlink system call)
+Date: 8th Aug, 2024.
+============================================================================
+*/
+
 /*Write a program to open a file with read write mode, write 10 bytes, move the file pointer by 10
 bytes (use lseek) and write again 10 bytes.
 a. check the return value of lseek

@@ -1,4 +1,13 @@
 /*
+============================================================================
+Name : 1a.c
+Author : Shatakshee Mishra
+Description : Create the following types of a files using (i) shell command (ii) system call
+a. soft link (symlink system call)
+Date: 8th Aug, 2024.
+============================================================================
+*/
+/*
 Write a program to print the following information about a given file.
 a. inode
 b. number of hard links

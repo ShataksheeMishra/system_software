@@ -1,3 +1,12 @@
+/*
+============================================================================
+Name : 1a.c
+Author : Shatakshee Mishra
+Description : Create the following types of a files using (i) shell command (ii) system call
+a. soft link (symlink system call)
+Date: 8th Aug, 2024.
+============================================================================
+*/
 /*16. Write a program to perform mandatory locking.
 a.implement write lock.*/
 #include<stdio.h>

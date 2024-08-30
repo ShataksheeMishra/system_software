@@ -1,3 +1,12 @@
+/*
+============================================================================
+Name : 1a.c
+Author : Shatakshee Mishra
+Description : Create the following types of a files using (i) shell command (ii) system call
+a. soft link (symlink system call)
+Date: 8th Aug, 2024.
+============================================================================
+*/
 /*Write a program to simulate online ticket reservation. Implement write lock
 Write a program to open a file, store a ticket number and exit. Write a separate program, to
 open the file, implement write lock, read the ticket number, increment the number and print

@@ -9,8 +9,27 @@ Date: 8th Aug, 2024.
 */
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+
 int main()
-{char *path = "ls";
- char *argv[] = {path, "-Rl", NULL};
- execvp(path, argv);
+{
+pid_t pid = getpid();
+
+int priority =  getpriority(PRIO_PROCESS , pid);
+printf("Current Priority : %d\n" , priority);
+
+int new_priority = nice(-15);
+
+if(new_priority == -1){
+perror("failed");
+}
+else{
+printf("New priority after nice(-15): %d\n",getpriority(PRIO_PROCESS,pid));
+}
+
+while(1){
+}
+
+return 0;
 }
