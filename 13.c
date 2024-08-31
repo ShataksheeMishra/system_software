@@ -1,15 +1,13 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 13.c
 Author : Shatakshee Mishra
-Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
-Date: 8th Aug, 2024.
+Description : Write a program to wait for a STDIN for 10 seconds using select. Write a proper print statement to
+verify whether the data is available within 10 seconds or not (check in $man 2 select).
+Date: 18th Aug, 2024.
 ============================================================================
 */
 
-/*Write a program to wait for a STDIN for 10 seconds using select. Write a proper print statement to
-verify whether the data is available within 10 seconds or not (check in $man 2 select).*/
 #include<stdio.h>
 #include<unistd.h>
 #include<stdlib.h>

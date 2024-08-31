@@ -1,16 +1,18 @@
 /*
 ============================================================================
-Name : 27e.c
+Name : 26a.c
 Author : Shatakshee Mishra
-Description : Write a program to execute ls -Rl by the following system calls
-e. execvp
+Description : Write a program to execute an executable program.
+a. use some executable program
 Date: 30th Aug, 2024.
 ============================================================================
 */
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
-int main()
-{char *path = "ls";
- char *argv[] = {path, "-Rl", NULL};
- execvp(path, argv);
+
+int main(int arg, char* argv[]) {
+        execv(argv[1], &argv[1]);
+        return 0;
 }

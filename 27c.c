@@ -1,10 +1,10 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 27c.c
 Author : Shatakshee Mishra
-Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
-Date: 8th Aug, 2024.
+Description : Write a program to execute ls -Rl by the following system calls
+c. execle
+Date: 30th Aug, 2024.
 ============================================================================
 */
 #include<stdio.h>

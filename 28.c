@@ -1,13 +1,11 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 28.c
 Author : Shatakshee Mishra
-Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
-Date: 8th Aug, 2024.
+Description : Write a program to get maximum and minimum real time priority.
+Date: 30th Aug, 2024.
 ============================================================================
 */
-/*Write a program to get maximum and minimum real time priority.*/
 #include<stdio.h>
 #include<sched.h>
 int main(){

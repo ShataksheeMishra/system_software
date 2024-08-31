@@ -1,16 +1,11 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 19.c
 Author : Shatakshee Mishra
-Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
-Date: 8th Aug, 2024.
+Description : Write a program to find out time taken to execute getpid system call. Use time stamp counter.
+Date: 30th Aug, 2024.
 ============================================================================
 */
-//Name -19
-//Author- Shatakshee Mishra
-//Roll no.- MT2024142
-/*Write a program to find out time taken to execute getpid system call. Use time stamp counter.*/
 #include<stdio.h>
 #include<unistd.h>
 #include<sys/time.h>

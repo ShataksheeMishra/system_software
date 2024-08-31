@@ -1,15 +1,13 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 29.c
 Author : Shatakshee Mishra
-Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
-Date: 8th Aug, 2024.
+Description :Write a program to get scheduling policy and modify the scheduling policy (SCHED_FIFO,
+SCHED_RR).
+Date: 30th Aug, 2024.
 ============================================================================
 */
 
-/*Write a program to get scheduling policy and modify the scheduling policy (SCHED_FIFO,
-SCHED_RR).*/
 #include<unistd.h>
 #include<stdio.h>
 #include<sched.h>

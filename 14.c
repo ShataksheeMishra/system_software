@@ -1,15 +1,13 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 14.c
 Author : Shatakshee Mishra
-Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
-Date: 8th Aug, 2024.
+Description : Write a program to find the type of a file.
+a. Input should be taken from command line.
+b. program should be able to identify any type of a file.
+Date: 22nd Aug, 2024.
 ============================================================================
 */
-/*Write a program to find the type of a file.
-a. Input should be taken from command line.
-b. program should be able to identify any type of a file.*/
 
 #include<stdio.h>
 #include<fcntl.h>

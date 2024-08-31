@@ -1,9 +1,9 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 1c.c
 Author : Shatakshee Mishra
 Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
+c. FIFO (mkfifo Library Function or mknod system call)
 Date: 8th Aug, 2024.
 ============================================================================
 */

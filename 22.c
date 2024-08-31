@@ -1,15 +1,13 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 22.c
 Author : Shatakshee Mishra
-Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
-Date: 8th Aug, 2024.
+Description : Write a program, open a file, call fork, and then write to the file by both the child as well as the
+parent processes. Check output of the file.
+Date: 30th Aug, 2024.
 ============================================================================
 */
 
-/*Write a program, open a file, call fork, and then write to the file by both the child as well as the
-parent processes. Check output of the file.*/
 #include<stdio.h>
 #include<fcntl.h>
 #include<unistd.h>

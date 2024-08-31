@@ -1,13 +1,11 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 12.c
 Author : Shatakshee Mishra
-Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
-Date: 8th Aug, 2024.
+Description : Write a program to find out the opening mode of a file. Use fcntl.
+Date: 12th Aug, 2024.
 ============================================================================
 */
-/*Write a program to find out the opening mode of a file. Use fcntl.*/
 #include <stdio.h>
 #include<fcntl.h>
 #include <unistd.h>
@@ -24,3 +22,8 @@ switch(mode){
 }
 
 }
+
+/*output
+shatakshee@shatakshee:~/ss$ ./a.out
+mode = 32770 - read and write mode
+*/

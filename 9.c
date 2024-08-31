@@ -1,14 +1,8 @@
 /*
 ============================================================================
-Name : 1a.c
+Name : 9.c
 Author : Shatakshee Mishra
-Description : Create the following types of a files using (i) shell command (ii) system call
-a. soft link (symlink system call)
-Date: 8th Aug, 2024.
-============================================================================
-*/
-/*
-Write a program to print the following information about a given file.
+Description : Write a program to print the following information about a given file.
 a. inode
 b. number of hard links
 c. uid
@@ -19,6 +13,9 @@ g. number of blocks
 h. time of last access
 i. time of last modification
 j. time of last change
+
+Date: 21st Aug, 2024.
+============================================================================
 */
 #include<sys/stat.h>
 #include<stdio.h>
@@ -45,3 +42,17 @@ printf("I-node number:%ju\n",  sb.st_ino);
 
 
 }
+
+/*output
+shatakshee@shatakshee:~/ss$ ./a.out foods
+I-node number:787758
+Mode: 100664 (octal)
+Link count:2
+Ownership:UID=1000   GID=1000
+Preferred I/O block size: 4096 bytes
+File size: 1214 bytes
+Blocks allocated: 8
+Last status change: Wed Aug 28 20:38:11 2024
+Last file access: Fri Aug 30 14:41:42 2024
+Last file modification:Wed Aug 28 20:38:11 2024
+*/
