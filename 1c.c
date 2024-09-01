@@ -8,14 +8,14 @@ Date: 8th Aug, 2024.
 ============================================================================
 */
 
+#include <sys/stat.h>
 #include<stdio.h>
-#include<fcntl.h>
-#include<unistd.h>
-int main (void){
-int fd;
-char buff[80];
-fd=open("myfifo", O_WRONLY);
-printf("enter name:");
-scanf("%[^\n]",buff);
-write(fd,buff,sizeof(buff));
+#include <unistd.h>
+
+int main(){
+char *path="fifofile";
+if((mknod(path,0744,0)==-1))
+{perror("error");}
+printf("success");
 }
+
