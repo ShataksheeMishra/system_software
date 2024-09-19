@@ -30,3 +30,20 @@ buf.sem_op=1;
 semop(semid,&buf,1);
 printf("exited cs\n");
 }
+
+/*output
+shatakshee@shatakshee:~/ss/hands-on-list2$ cc 32a.c
+shatakshee@shatakshee:~/ss/hands-on-list2$ ./a.out
+before eterning cs
+inside cs
+current tickect no. - 20
+ticket no. after updation - 21
+press enter to exit cs
+
+exited cs
+output of another terminal
+cc 32a.c
+shatakshee@shatakshee:~/ss/hands-on-list2$ ./a.out
+before eterning cs
+*/
+
