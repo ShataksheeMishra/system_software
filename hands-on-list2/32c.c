@@ -1,3 +1,12 @@
+/*
+============================================================================
+Name : 32c.c
+Author : Shatakshee Mishra
+Description : Write a C, Ansi-style program to perform Record locking.
+                       a. Implement write lock
+Date: 20th Sep, 2024.
+============================================================================
+*/
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/types.h>

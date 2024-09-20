@@ -1,3 +1,12 @@
+/*
+============================================================================
+Name : 1c.c
+Author : Shatakshee Mishra
+Description : Write a C, Ansi-style program to perform Record locking.
+                       a. Implement write lock
+Date: 12th Sep, 2024.
+============================================================================
+*/
 #include<stdio.h>
 #include<sys/time.h>
 #include<unistd.h>
