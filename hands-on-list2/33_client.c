@@ -13,7 +13,7 @@ sd = socket (AF_UNIX, SOCK_STREAM, 0);
 
 serv.sin_family = AF_UNIX;
 serv.sin_addr.s_addr = INADDR_ANY;
-serv.sin_port = htons (5088);
+serv.sin_port = htons (5055);
 connect (sd,(void*)( &serv),sizeof (serv));
 write(sd,"hi i am client\n",16);
 read(sd,buff,sizeof (buff));

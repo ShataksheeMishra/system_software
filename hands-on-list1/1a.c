@@ -11,6 +11,6 @@ Date: 8th Aug, 2024.
 #include<unistd.h>
 int main()
 {
-symlink("foods","sftlink")
+symlink("foods","sftlink");
 
 }
