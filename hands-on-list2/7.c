@@ -1,18 +1,31 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<pthread.h>
-void *myThread(void *vargp)
-{printf("hi i am thread %d\n",vargp);
-sleep(5);
+void *myThread(void *arg)
+{int num = *((int*)arg);
+pthread_t thread_id = pthread_self();
+printf("hi i am thread %lu\n",arg);
 return NULL;
 }
 int main()
+{pthread_t thread[3];
+int arg[3];
+
+for(int i=0;i<3;i++)
 {
-pthread_t tid;
-pthread_create(&tid,NULL,myThread,NULL);
-pthread_create(&tid,NULL,myThread,NULL);
-pthread_create(&tid,NULL,myThread,NULL);
-pthread_create(&tid,NULL,myThread,NULL);
-getchar();
-pthread_join(tid,NULL);
+arg[i] = i+1;
+pthread_create(&thread[i],NULL,myThread, &arg[i]);
 }
+
+for(int i=0;i<3;i++)
+{
+pthread_join(thread[i] , NULL);
+}
+}
+
+/*output
+shatakshee@shatakshee:~/ss/hands-on-list2$ ./a.out
+hi i am thread 140722222001956
+hi i am thread 140722222001960
+hi i am thread 140722222001964
+*/
