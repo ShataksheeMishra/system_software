@@ -1,3 +1,14 @@
+/*
+============================================================================
+Name : 16.c
+Author : Shatakshee Mishra
+Description : Write a program to send and receive data from parent to child vice versa. Use two way
+communication.
+Date: 21st Sep, 2024.
+============================================================================
+*/
+
+
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <stdio.h>

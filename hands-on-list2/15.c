@@ -1,3 +1,11 @@
+/*
+============================================================================
+Name : 15.c
+Author : Shatakshee Mishra
+Description : Write a simple program to send some data from parent to the child process.
+Date: 21st Sep, 2024.
+============================================================================
+*/
 
 #include <sys/types.h>
 #include <sys/wait.h>

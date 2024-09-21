@@ -1,0 +1,3 @@
+mknod and mkfifo() both call mknod() in background so we can conclude that mknod() is faster
+because mkfifo() has some extra system calls before calling mknod() as mknod() is an actual 
+system call and mkfifo() is a library function

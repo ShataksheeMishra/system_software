@@ -1,4 +1,12 @@
-0#include<stdio.h>
+/*
+============================================================================
+Name : 33_server.c
+Author : Shatakshee Mishra
+Description :Write a program to communicate between two machines using socket.
+Date: 19th Sep, 2024.
+============================================================================
+*/
+#include<stdio.h>
 #include<fcntl.h>
 #include<unistd.h>
 #include<sys/socket.h>

@@ -1,3 +1,13 @@
+/*
+============================================================================
+Name : 9.c
+Author : Shatakshee Mishra
+Description : Write a program to ignore a SIGINT signal then reset the default action of the SIGINT
+signal - Use signal system call.
+Date: 21st Sep, 2024.
+============================================================================
+*/
+
 
 
 #include <stdio.h>

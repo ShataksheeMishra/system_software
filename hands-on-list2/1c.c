@@ -2,8 +2,11 @@
 ============================================================================
 Name : 1c.c
 Author : Shatakshee Mishra
-Description : Write a C, Ansi-style program to perform Record locking.
-                       a. Implement write lock
+Description : Write a separate program (for each time domain) to set a interval timer in 10sec and
+10micro second
+a. ITIMER_REAL
+b. ITIMER_VIRTUAL
+c. ITIMER_PROF
 Date: 12th Sep, 2024.
 ============================================================================
 */

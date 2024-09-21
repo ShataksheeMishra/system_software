@@ -1,3 +1,15 @@
+/*
+============================================================================
+Name : 32b.c
+Author : Shatakshee Mishra
+Description :Write a program to implement semaphore to protect any critical section.
+a. rewrite the ticket number creation program using semaphore
+b. protect shared memory from concurrent write access
+c. protect multiple pseudo resources ( may be two) using counting semaphore
+d. remove the created semaphore
+Date: 19th Sep, 2024.
+============================================================================
+*/
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/types.h>

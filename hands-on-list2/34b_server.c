@@ -1,3 +1,13 @@
+/*
+============================================================================
+Name : 34b_server.c
+Author : Shatakshee Mishra
+Description :Write a program to create a concurrent server.
+a. use fork
+b. use pthread_create
+Date: 19th Sep, 2024.
+============================================================================
+*/
 #include <netinet/in.h>
 #include<stdlib.h>
 #include<sys/types.h>

@@ -1,4 +1,11 @@
-#include <stdio.h>
+/*
+============================================================================
+Name : 29.c
+Author : Shatakshee Mishra
+Description :Write a program to remove the message queue.
+Date: 21st Sep, 2024.
+============================================================================
+*/#include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
 #include <stdlib.h>

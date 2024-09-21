@@ -1,3 +1,15 @@
+/*
+============================================================================
+Name : 17c.c
+Author : Shatakshee Mishra
+Description :Write a program to execute ls -l | wc.
+a. use dup
+b. use dup2
+c. use fcntl 
+Date: 21st Sep, 2024.
+============================================================================
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

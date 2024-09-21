@@ -1,3 +1,13 @@
+/*
+============================================================================
+Name : 24.c
+Author : Shatakshee Mishra
+Description : Write a program to create a message queue and print the key and message queue id.
+Date: 21st Sep, 2024.
+============================================================================
+*/
+
+
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
