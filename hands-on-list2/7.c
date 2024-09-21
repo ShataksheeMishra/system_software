@@ -4,7 +4,7 @@
 void *myThread(void *arg)
 {int num = *((int*)arg);
 pthread_t thread_id = pthread_self();
-printf("hi i am thread %lu\n",arg);
+printf("hi i am thread %lu\n",thread_id);
 return NULL;
 }
 int main()

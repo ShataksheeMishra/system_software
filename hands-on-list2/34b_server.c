@@ -8,10 +8,10 @@
 #include<pthread.h>
 void handle_client(void *nsd,void *sd) {
     char buff[80];
+close(sd);
 read(nsd,buff,sizeof (buff));
 printf("message from client:%s\n",buff);
 write(nsd,"hi i am server\n",16);
-close(nsd);
 }
 
 int main(){
@@ -35,5 +35,5 @@ nsd = accept (sd,(void*)( &cli), &sz);
 pthread_t threadID;
    (pthread_create(&threadID, NULL, (void *)handle_client, (&nsd,&sd)));
 }
-close(sd);
+close(nsd);
 }

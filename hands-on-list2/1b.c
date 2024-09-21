@@ -19,12 +19,12 @@ void handleSignal(int sig) {
 int main(){
 signal(SIGVTALRM, handleSignal);
 struct timeval interval;
-interval.tv_sec =5;
-interval.tv_usec = 5;
+interval.tv_sec =10;
+interval.tv_usec = 10;
 
 struct timeval value;
-value.tv_sec = 5;
-value.tv_usec = 5;
+value.tv_sec = 10;
+value.tv_usec = 10;
 
 struct itimerval newValue;
 newValue.it_interval = interval;

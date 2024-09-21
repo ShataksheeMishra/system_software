@@ -17,11 +17,11 @@ void signalhandle(int sig)
 int main(){
 signal(SIGPROF, signalhandle);
 struct  timeval interval;
-interval.tv_sec=5;
-interval.tv_usec=0;
+interval.tv_sec=10;
+interval.tv_usec=10;
 struct timeval value;
-value.tv_sec=5;
-value.tv_usec=0;
+value.tv_sec=10;
+value.tv_usec=10;
 struct itimerval  initial;
 initial.it_interval=interval;
 initial.it_value=value;
