@@ -1,0 +1,69 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<unistd.h>
+#include<stdbool.h>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<fcntl.h>
+#include<errno.h>
+#include <fcntl.h>
+#include <sys/file.h>
+#include <sys/socket.h>
+#include "admin.h"
+bool admin_login(int clientSocket);
+bool authenticate_admin(int clientSocket);
+struct Credentials
+{
+char username[50];
+char password[10];
+};
+struct Credentials admin={"Shatakshee","0205"};
+bool admin_login(int clientSocket)
+{printf("hello\n");
+send(clientSocket,"hello\n",strlen("hello\n"),0)
+{perror("error");}
+
+if(authenticate_admin(clientSocket))
+{send(clientSocket,"login successful\n",strlen("login successful\n"),0);
+}
+}
+bool authenticate_admin(int clientSocket)
+{
+send(clientSocket,"hi\n",strlen("hi\n"),0);
+printf("hi\n");
+char username[50];
+char password[10];
+send(clientSocket,"enter username:\n",strlen("enter username:\n"),0);
+ssize_t read=recv(clientSocket,username,sizeof(username),0);
+if (read<=0)
+{
+close (clientSocket);
+return 0;
+}
+if(username[read -1]=='\n')
+{username[read -1]='\0';}
+else
+{username[read -1]='\0';}
+send(clientSocket, "enter password:\n",strlen("enter password:\n"),0);
+read=recv(clientSocket,password,sizeof(password),0);
+if(read<=0)
+{close(clientSocket);
+return 0;
+}
+if(password[read -1]=='\n')
+{
+password[read -1]='\0';
+}
+else
+{password[read -1]='\0';}
+if (strcmp(username,admin.username)==0 && strcmp(password,admin.password)==0)
+{return true;}
+else
+{send(clientSocket,"invalid credentials\n",strlen("invalid credentials\n"),0);
+close(clientSocket);
+return false;
+}
+}
+
+

@@ -7,41 +7,106 @@
 #include<pthread.h>
 #include<stdbool.h>
 #include<string.h>
-#define PORT 5050
-void *handleclient(void * arg)
+#include"admin.h"
+#define PORT 5083
+#define MAX 5
+void *handleclient(void * clientSocket)
 {
-int clientSocket= *((int *)arg);
+int socket = *(int *)clientSocket;
+while(1){
 char buff[1024];
-char menu[]="select number corresponding to your role:\n1.customer\n2.bank employee\n3.manager\n4.admin\n";
- send(clientSocket, menu, strlen(menu),0);
- while (1) {
-        int bytesRead = recv(clientSocket, buff, sizeof(buff), 0);
-        if (bytesRead <= 0) 
-          {
-            close(clientSocket);
-            pthread_exit(NULL);
-          }
-}}
+ char *role="enter number according to your role\n1.customer\n2.bank employee\n3.manager\n4.admin\n";
+send(socket,role,strlen(role),0);
+
+ssize_t read=recv(socket,buff,sizeof(buff),0);
+if(read<=0)
+{
+close(socket);
+pthread_exit (NULL);
+}
+buff[read]='\0';
+if(strstr(buff,"admin")!=NULL)
+{
+admin_login(socket);
+}
+send(socket,buff,read,0);
+}// while end
+pthread_exit(NULL);
+}//handleclient end
+/*void *handleclient(void *client_socket) {
+	printf("connected with client"); 
+   int socket = *(int *)client_socket;
+
+    // Display the menu to the client
+    const char *menu = "Welcome! Please select your role:\n"
+                       "1. Customer\n"
+                       "2. Bank Employee\n"
+                       "3. Manager\n"
+                       "4. Admin\n"
+                       "Enter your choice (1-4): ";
+    
+    send(socket, menu, strlen(menu), 0);
+	printf("sent to client\n");
+    char choice[10];  // Buffer for the client's choice
+    ssize_t bytes_read = read(socket, choice, sizeof(choice) - 1);
+    if (bytes_read < 0) {
+        perror("Failed to read from client");
+        close(socket);
+        return NULL;  // Handle the error
+    }
+    
+    choice[bytes_read] = '\0';  // Null-terminate the string
+
+    // Determine the role based on the choice
+    int role_choice = atoi(choice);
+	printf("%d",role_choice);
+    switch (role_choice) {
+        case 1:
+            //handle_customer(socket);
+            break;
+        case 2:
+           // handle_bank_employee(socket);
+            break;
+        case 3:
+            //handle_manager(socket);
+            break;
+        case 4:
+            admin_login(socket);
+            break;
+        default:
+            const char *invalid_choice = "Invalid choice. Please try again.\n";
+            send(socket, invalid_choice, strlen(invalid_choice), 0);
+            break;
+    }
+
+ 
+
+    // Close the client socket when done
+    close(socket);
+    printf("Client disconnected.\n");
+    return NULL;
+
+}*/
 int main()
 {
 int serverSocket,clientSocket;
 struct sockaddr_in serverAddr,clientAddr;
 socklen_t clientAddrLen = sizeof(clientAddr);
 
-serverSocket=socket(AF_INET,SOCK_STREAM,0);
+serverSocket=socket(AF_UNIX,SOCK_STREAM,0);
 if(serverSocket==-1)
 {
 	perror("creation failed");
 	exit(1);
 }
-serverAddr.sin_family=AF_INET;
+serverAddr.sin_family=AF_UNIX;
 serverAddr.sin_port=htons(PORT);
 serverAddr.sin_addr.s_addr=INADDR_ANY;
 if(bind(serverSocket,(struct sockaddr *)&serverAddr,sizeof(serverAddr))==-1)
 {	perror("binding failed");
 	exit(1);
 }
-if(listen(serverSocket,5)==-1)
+if(listen(serverSocket,MAX)==-1)
 {
 	perror("listening failed");
 	exit(1);
