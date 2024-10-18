@@ -341,17 +341,14 @@ bool modify_employee(int cd) {
     char format[300];
     char enter_id[] = "-----Update Employee Data-----\nEnter ID of the employee whose data needs to be changed:";
 
-    // Ask for the employee ID to update
     write(cd, enter_id, sizeof(enter_id));
     ssize_t bytes_id = read(cd, empid, sizeof(empid));
     if (bytes_id == -1) {
         perror("Error in receiving Employee ID");
         return false;
     }
-    empid[bytes_id] = '\0';  // Null-terminate the employee ID
     printf("Received Employee ID: %s\n", empid);
 
-    // Ask for new employee data (name and is_empl)
     write(cd, "Name:", strlen("Name:"));
     read(cd, data_new.username, sizeof(data_new.username));
 
@@ -360,79 +357,61 @@ bool modify_employee(int cd) {
 	write(cd,"role",strlen("role"));
 	read(cd,data_new.role,sizeof(data_new.role));
 
-    // Open the employee database file in read-write mode
     int db_fd = open("employee.txt", O_RDWR);
     if (db_fd == -1) {
         perror("Error in opening the database file");
         return false;
     }
 
-    // File read buffer for lines
     char line[300];
     struct employee temp;
     bool is_there = false;
 
-    // Lock structure for file locking
     struct flock lock;
     memset(&lock, 0, sizeof(lock));
-    lock.l_type = F_WRLCK;  // Write lock
-    lock.l_whence = SEEK_SET;  // Lock from the start of the file
+    lock.l_type = F_WRLCK;  
+    lock.l_whence = SEEK_SET;  
 
-    // Keep track of the file offset
     off_t record_offset = 0;
     off_t current_position = 0;
 
-    // Buffer to store characters read from the file
     char buffer;
     int line_index = 0;
 
-    // Read file character-by-character to handle newlines and read line-by-line
     while (read(db_fd, &buffer, 1) > 0) {
-        // Accumulate characters until we hit a newline or end of the buffer
         if (buffer != '\n') {
             line[line_index++] = buffer;
         } else {
-            // Terminate the current line with a null character
             line[line_index] = '\0';
             line_index = 0;
 
-            // Store the current position (start of the record)
             current_position = lseek(db_fd, 0, SEEK_CUR);
 
-            // Parse the line to extract employee details
             sscanf(line, "%[^,],%[^,],%[^,],%[^,]", temp.id, temp.password, temp.username, &temp.role);
             printf("Read Employee: ID=%s, Name=%s, Password=%s, Role=%s\n", temp.id, temp.password, temp.username, temp.role);
 printf("%s,%s\n",temp.id,empid);
-            // Check if the employee ID matches
             if (atoi(temp.id)==atoi( empid)) {
                 printf("Employee ID matched.\n");
+                lock.l_start = current_position - strlen(line) - 1;
+                lock.l_len = strlen(line) + 1;
 
-                // Set up the file lock
-                lock.l_start = current_position - strlen(line) - 1;  // Lock the start of the current record (move back for the newline)
-                lock.l_len = strlen(line) + 1;  // Include the length of the current record and the newline
-
-                // Try to obtain the lock
                 if (fcntl(db_fd, F_SETLK, &lock) == -1) {
                     perror("Error in obtaining lock");
                     close(db_fd);
                     return false;
                 }
 
-                // Prepare updated employee data
-                strcpy(data_new.password, temp.password);  // Preserve the old password
+                strcpy(data_new.password, temp.password);  
                 snprintf(format, sizeof(format), "%s,%s,%s,%s\n", data_new.id, data_new.password, data_new.username, data_new.role);
 
-                // Move file pointer to the start of the current employee record
                 lseek(db_fd, current_position - strlen(line) - 1, SEEK_SET);
 
-                // Write the updated employee record
                 if (write(db_fd, format, strlen(format)) == -1) {
                     write(cd, "Error in Updating Data", strlen("Error in Updating Data"));
                     close(db_fd);
                     return false;
                 }
 
-                // Unlock the file
                 lock.l_type = F_UNLCK;
                 if (fcntl(db_fd, F_SETLK, &lock) == -1) {
                     perror("Error in releasing the lock");
@@ -446,10 +425,8 @@ printf("%s,%s\n",temp.id,empid);
         }
     }
 
-    // Close the file
     close(db_fd);
 
-    // Handle case where employee is not found
     if (!is_there) {
         write(cd, "Employee Not Found", strlen("Employee Not Found"));
         return false;

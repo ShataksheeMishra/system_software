@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall -g
 
 # Source files
-SRCS = miniserver.c admin.c
+SRCS = miniserver.c admin.c employee.c
 
 # Header files
 HDRS = admin.h employee.h

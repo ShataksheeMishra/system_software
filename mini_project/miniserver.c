@@ -8,7 +8,8 @@
 #include<stdbool.h>
 #include<string.h>
 #include"admin.h"
-#define PORT 5129
+#include"employee.h"
+#define PORT 5130
 #define MAX 5
 void *handleclient(void * clientSocket)
 {
@@ -29,6 +30,8 @@ if(strstr(buff,"admin")!=NULL)
 {
 admin_login(socket);
 }
+else if (strstr(buff,"employee")!=NULL)
+{employee_login(socket);}
 send(socket,buff,read,0);
 }// while end
 pthread_exit(NULL);
