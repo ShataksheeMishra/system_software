@@ -173,9 +173,14 @@ bool verify_credentials(const char *username, const char *password) {
 bool add_employee(int clientSocket)
 {
 struct employee add;
-add.id=get_id();
+//int empid=get_id();
+//add.id=empid;
+send(clientSocket,"enter empid\n",strlen("enter empid\n"),0);
+int read=recv(clientSocket,add.id,sizeof(add.id),0);
+add.id[read -1]='\0';
 send(clientSocket,"enter username\n",strlen("enter username\n"),0);
-int read=recv(clientSocket,add.username,sizeof(add.username),0);
+ read=recv(clientSocket,add.username,sizeof(add.username),0);
+//add.id[read -1]='\0';
 if(read<=0)
 {send(clientSocket,"error in fetching username\n",strlen("error in fetching username\n"),0);
 return false;}
@@ -194,7 +199,7 @@ return false;}
 add.role[read-1]='\0';
 FILE *file=fopen("employee.txt","a");
 if(file!=NULL)
-{fprintf(file,"%d,%s,%s,%s\n",add.id,add.password,add.username,add.role);
+{fprintf(file,"%s,%s,%s,%s\n",add.id,add.password,add.username,add.role);
 fclose(file);
 printf("true\n");
 fflush(stdout);
@@ -206,9 +211,30 @@ return false;
 }//end of add employee
 
 
-int get_id()
-{
-int id=read_id();
+/*int get_id()
+{FILE *file = fopen("employee.txt", "r");
+    if (file == NULL) {
+        perror("Error opening employee file");
+        return 1; // Starting ID from 1
+    }
+
+    int max_id = 0;
+    char line[1024];
+    
+    // Read through the file to find the highest ID
+    while (fgets(line, sizeof(line), file)) {
+        int id;
+        // Assuming the ID is the first value in the line
+        sscanf(line, "%d", &id);
+        if (id > max_id) {
+            max_id = id;
+        }
+    }
+
+    fclose(file);
+    return max_id + 1; // Return the next available ID
+}*/
+/*int id=read_id();
 update_id(id+1);
 return id;}
 int read_id()
@@ -236,7 +262,7 @@ fseek(file,0,SEEK_SET);
 fprintf(file,"%d\n",id);
 fclose(file);}
 }//end update_id
-/*
+
 bool modify_employee(int clientSocket)
 {
 struct employee update;
@@ -256,19 +282,20 @@ return false;}
 //if(fd==NULL){send(clientSocket,"no record\n",strlen("no record\n"),0);
 //return false;}
 else{
-int tempid=read_id();
-if(empid_int>=tempid)
-{send(clientSocket,"please enter correct employee id\n",strlen("please enter correct employee id\n"),0);
-return false;}
-else{
+//int tempid=read_id();
+//if(empid_int>=tempid)
+//{send(clientSocket,"please enter correct employee id\n",strlen("please enter correct employee id\n"),0);
+//return false;}
+//else{
 update.id=empid_int;
 struct flock lock;
 lock.l_type=F_WRLCK;
 lock.l_start=empid_int*sizeof(struct employee);
 lock.l_len=sizeof(struct employee);
 lock.l_whence=SEEK_SET;
-lseek(fd,empid_int*sizeof(struct employee),SEEK_SET);
 fcntl(fd,F_SETLKW,&lock);
+//lseek(fd,1*sizeof(struct employee),SEEK_SET);
+
 if (read(fd, &update, sizeof(struct employee)) <= 0) {
         send(clientSocket, "Error in reading employee record\n", strlen("Error in reading employee record\n"), 0);
         lock.l_type = F_UNLCK;
@@ -294,165 +321,265 @@ if(r<=0)
 {send(clientSocket,"error in fetching role\n",strlen("error in fetching role\n"),0);
 return false;}
 update.role[r-1]='\0';
-lseek(fd,empid_int*sizeof(struct employee),SEEK_SET);
-//char buffer[1024];
-//int buffer_size=snprintf(buffer,sizeof(buffer),"%d,%s,%s,%s\n",update.id,update.password,update.username,update.role);
-write(fd,&update,sizeof(struct employee));
+lseek(fd,sizeof(empid_int)+(empid_int-1)*sizeof(struct employee),SEEK_SET);
+
+//fprintf(file,"%d,%s,%s,%s\n",update.id,update.password,update.username,update.role);
+
+char buffer[1024];
+int buffer_size=snprintf(buffer,sizeof(buffer),"%d,%s,%s,%s\n",update.id,update.password,update.username,update.role);
+write(fd,buffer,buffer_size);
 lock.l_type=F_UNLCK;
 fcntl(fd,F_SETLK,&lock);
+close(fd);
 return true;}
-}//end of else
+//}//end of else
 }//end of modify
 */
-bool modify_employee(int clientSocket)
-{
-    struct employee update;
+bool modify_employee(int cd) {
+    struct employee data_new;
     char empid[10];
-    
-    // Prompt for employee ID
-    send(clientSocket, "Enter employee ID\n", strlen("Enter employee ID\n"), 0);
-    int r = recv(clientSocket, empid, sizeof(empid), 0);
-    if (r <= 0) {
-        send(clientSocket, "Error in fetching employee ID\n", strlen("Error in fetching employee ID\n"), 0);
+    char format[300];
+    char enter_id[] = "-----Update Employee Data-----\nEnter ID of the employee whose data needs to be changed:";
+
+    // Ask for the employee ID to update
+    write(cd, enter_id, sizeof(enter_id));
+    ssize_t bytes_id = read(cd, empid, sizeof(empid));
+    if (bytes_id == -1) {
+        perror("Error in receiving Employee ID");
         return false;
     }
-    
-    // Convert employee ID to integer
-    char *endptr;
-    int empid_int = strtol(empid, &endptr, 10);
+    empid[bytes_id] = '\0';  // Null-terminate the employee ID
+    printf("Received Employee ID: %s\n", empid);
 
-    // Open the employee file
-    int fd = open("employee.txt", O_RDWR);
-    if (fd == -1) {
-        perror("Error opening file");
+    // Ask for new employee data (name and is_empl)
+    write(cd, "Name:", strlen("Name:"));
+    read(cd, data_new.username, sizeof(data_new.username));
+
+    write(cd, "ID:", strlen("ID:"));
+    read(cd, data_new.id, sizeof(data_new.id));
+	write(cd,"role",strlen("role"));
+	read(cd,data_new.role,sizeof(data_new.role));
+
+    // Open the employee database file in read-write mode
+    int db_fd = open("employee.txt", O_RDWR);
+    if (db_fd == -1) {
+        perror("Error in opening the database file");
         return false;
     }
-    
-    // Check if the employee ID is valid
-    int tempid = read_id();
-    if (empid_int >= tempid) {
-        send(clientSocket, "Please enter a correct employee ID\n", strlen("Please enter a correct employee ID\n"), 0);
-        close(fd);
-        return false;
-    } 
 
-    // Lock the specific record
+    // File read buffer for lines
+    char line[300];
+    struct employee temp;
+    bool is_there = false;
+
+    // Lock structure for file locking
     struct flock lock;
-    lock.l_type = F_WRLCK;
-    lock.l_start = empid_int * sizeof(struct employee);
-    lock.l_len = sizeof(struct employee);
-    lock.l_whence = SEEK_SET;
-    
-    // Move to the position of the employee record
-    lseek(fd, empid_int * sizeof(struct employee), SEEK_SET);
-    fcntl(fd, F_SETLKW, &lock);
+    memset(&lock, 0, sizeof(lock));
+    lock.l_type = F_WRLCK;  // Write lock
+    lock.l_whence = SEEK_SET;  // Lock from the start of the file
 
-    // Read the existing employee data
-    if (read(fd, &update, sizeof(struct employee)) != sizeof(struct employee)) {
-        send(clientSocket, "Error in reading employee record\n", strlen("Error in reading employee record\n"), 0);
-        lock.l_type = F_UNLCK;
-        fcntl(fd, F_SETLK, &lock);
-        close(fd);
+    // Keep track of the file offset
+    off_t record_offset = 0;
+    off_t current_position = 0;
+
+    // Buffer to store characters read from the file
+    char buffer;
+    int line_index = 0;
+
+    // Read file character-by-character to handle newlines and read line-by-line
+    while (read(db_fd, &buffer, 1) > 0) {
+        // Accumulate characters until we hit a newline or end of the buffer
+        if (buffer != '\n') {
+            line[line_index++] = buffer;
+        } else {
+            // Terminate the current line with a null character
+            line[line_index] = '\0';
+            line_index = 0;
+
+            // Store the current position (start of the record)
+            current_position = lseek(db_fd, 0, SEEK_CUR);
+
+            // Parse the line to extract employee details
+            sscanf(line, "%[^,],%[^,],%[^,],%[^,]", temp.id, temp.password, temp.username, &temp.role);
+            printf("Read Employee: ID=%s, Name=%s, Password=%s, Role=%s\n", temp.id, temp.password, temp.username, temp.role);
+printf("%s,%s\n",temp.id,empid);
+            // Check if the employee ID matches
+            if (atoi(temp.id)==atoi( empid)) {
+                printf("Employee ID matched.\n");
+
+                // Set up the file lock
+                lock.l_start = current_position - strlen(line) - 1;  // Lock the start of the current record (move back for the newline)
+                lock.l_len = strlen(line) + 1;  // Include the length of the current record and the newline
+
+                // Try to obtain the lock
+                if (fcntl(db_fd, F_SETLK, &lock) == -1) {
+                    perror("Error in obtaining lock");
+                    close(db_fd);
+                    return false;
+                }
+
+                // Prepare updated employee data
+                strcpy(data_new.password, temp.password);  // Preserve the old password
+                snprintf(format, sizeof(format), "%s,%s,%s,%s\n", data_new.id, data_new.password, data_new.username, data_new.role);
+
+                // Move file pointer to the start of the current employee record
+                lseek(db_fd, current_position - strlen(line) - 1, SEEK_SET);
+
+                // Write the updated employee record
+                if (write(db_fd, format, strlen(format)) == -1) {
+                    write(cd, "Error in Updating Data", strlen("Error in Updating Data"));
+                    close(db_fd);
+                    return false;
+                }
+
+                // Unlock the file
+                lock.l_type = F_UNLCK;
+                if (fcntl(db_fd, F_SETLK, &lock) == -1) {
+                    perror("Error in releasing the lock");
+                    close(db_fd);
+                    return false;
+                }
+
+                is_there = true;
+                break;
+            }
+        }
+    }
+
+    // Close the file
+    close(db_fd);
+
+    // Handle case where employee is not found
+    if (!is_there) {
+        write(cd, "Employee Not Found", strlen("Employee Not Found"));
         return false;
     }
 
-    // Update username
-    send(clientSocket, "Enter new username\n", strlen("Enter new username\n"), 0);
-    r = recv(clientSocket, update.username, sizeof(update.username), 0);
-    if (r <= 0) {
-        send(clientSocket, "Error in fetching username\n", strlen("Error in fetching username\n"), 0);
-        lock.l_type = F_UNLCK;
-        fcntl(fd, F_SETLK, &lock);
-        close(fd);
-        return false;
-    }
-    update.username[r - 1] = '\0';  // Null-terminate the string
-
-    // Update password
-    send(clientSocket, "Enter new password\n", strlen("Enter new password\n"), 0);
-    r = recv(clientSocket, update.password, sizeof(update.password), 0);
-    if (r <= 0) {
-        send(clientSocket, "Error in fetching password\n", strlen("Error in fetching password\n"), 0);
-        lock.l_type = F_UNLCK;
-        fcntl(fd, F_SETLK, &lock);
-        close(fd);
-        return false;
-    }
-    update.password[r - 1] = '\0';  // Null-terminate the string
-
-    // Update role
-    send(clientSocket, "Enter new role\n", strlen("Enter new role\n"), 0);
-    r = recv(clientSocket, update.role, sizeof(update.role), 0);
-    if (read <= 0) {
-        send(clientSocket, "Error in fetching role\n", strlen("Error in fetching role\n"), 0);
-        lock.l_type = F_UNLCK;
-        fcntl(fd, F_SETLK, &lock);
-        close(fd);
-        return false;
-    }
-    update.role[r - 1] = '\0';  // Null-terminate the string
-
-    // Write the updated employee structure back to the file
-    lseek(fd, empid_int * sizeof(struct employee), SEEK_SET);
-    if (write(fd, &update, sizeof(struct employee)) != sizeof(struct employee)) {
-        send(clientSocket, "Error in updating employee record\n", strlen("Error in updating employee record\n"), 0);
-        lock.l_type = F_UNLCK;
-        fcntl(fd, F_SETLK, &lock);
-        close(fd);
-        return false;
-    }
-
-    // Unlock the record
-    lock.l_type = F_UNLCK;
-    fcntl(fd, F_SETLK, &lock);
-    close(fd);
-    
     return true;
 }
 
 
-bool manage_user(int clientSocket)
+bool manage_user(int cd)
 {
-struct employee update;
-char empid[10];
-send (clientSocket,"enter employee id\n",strlen("enter employee id\n"),0);
-int read=recv(clientSocket,empid,sizeof(empid),0);
-if(read<=0)
-{send(clientSocket,"error in fetching username\n",strlen("error in fetching username\n"),0);
-return false;}
-char *endptr;
-int empid_int = strtol(empid, &endptr, 10);
-//struct employee emp;
-int fd=open("employee.txt",O_RDWR);
-if (fd==-1)
-{perror("error opening file");
-return false;}
-//if(fd==NULL){send(clientSocket,"no record\n",strlen("no record\n"),0);
-//return false;}
-else{
-int tempid=read_id();
-if(empid_int>=tempid)
-{send(clientSocket,"please enter correct employee id\n",strlen("please enter correct employee id\n"),0);
-return false;}
-else{
+struct employee data_new;
+    char empid[10];
+    char format[300];
+    char enter_id[] = "-----Update Employee Data-----\nEnter ID of the employee whose data needs to be changed:";
 
-struct flock lock;
-lock.l_type=F_WRLCK;
-lock.l_start=empid_int*sizeof(struct employee);
-lock.l_len=sizeof(struct employee);
-lseek(fd,empid_int*sizeof(struct employee),SEEK_SET);
-fcntl(fd,F_SETLKW,&lock);
-send(clientSocket,"enter role\n",strlen("enter role\n"),0);
-read=recv(clientSocket,update.role,sizeof(update.role),0);
-if(read<=0)
-{send(clientSocket,"error in fetching role\n",strlen("error in fetching role\n"),0);
-return false;}
-update.role[read-1]='\0';
-lseek(fd, -1 * sizeof(struct employee), SEEK_CUR);
-write(fd, &update, sizeof(struct employee));
-lock.l_type = F_UNLCK;
-fcntl(fd, F_SETLK, &lock);
-close(fd);
-return true;}
+    // Ask for the employee ID to update
+    write(cd, enter_id, sizeof(enter_id));
+    ssize_t bytes_id = read(cd, empid, sizeof(empid));
+    if (bytes_id == -1) {
+        perror("Error in receiving Employee ID");
+        return false;
+    }
+    empid[bytes_id] = '\0';  // Null-terminate the employee ID
+    printf("Received Employee ID: %s\n", empid);
+
+    // Ask for new employee data (name and is_empl)
+    //write(cd, "Name:", strlen("Name:"));
+    //read(cd, data_new.username, sizeof(data_new.username));
+
+    //write(cd, "ID:", strlen("ID:"));
+    //read(cd, data_new.id, sizeof(data_new.id));
+	write(cd,"role",strlen("role"));
+	read(cd,data_new.role,sizeof(data_new.role));
+
+    // Open the employee database file in read-write mode
+    int db_fd = open("employee.txt", O_RDWR);
+    if (db_fd == -1) {
+        perror("Error in opening the database file");
+        return false;
+    }
+
+    // File read buffer for lines
+    char line[300];
+    struct employee temp;
+    bool is_there = false;
+
+    // Lock structure for file locking
+    struct flock lock;
+    memset(&lock, 0, sizeof(lock));
+    lock.l_type = F_WRLCK;  // Write lock
+    lock.l_whence = SEEK_SET;  // Lock from the start of the file
+
+    // Keep track of the file offset
+    off_t record_offset = 0;
+    off_t current_position = 0;
+
+    // Buffer to store characters read from the file
+    char buffer;
+    int line_index = 0;
+
+    // Read file character-by-character to handle newlines and read line-by-line
+    while (read(db_fd, &buffer, 1) > 0) {
+        // Accumulate characters until we hit a newline or end of the buffer
+        if (buffer != '\n') {
+            line[line_index++] = buffer;
+        } else {
+            // Terminate the current line with a null character
+            line[line_index] = '\0';
+            line_index = 0;
+
+            // Store the current position (start of the record)
+            current_position = lseek(db_fd, 0, SEEK_CUR);
+
+            // Parse the line to extract employee details
+            sscanf(line, "%[^,],%[^,],%[^,],%[^,]", temp.id, temp.password, temp.username, &temp.role);
+            printf("Read Employee: ID=%s, Name=%s, Password=%s, Role=%s\n", temp.id, temp.password, temp.username, temp.role);
+	printf("%s,%s\n",temp.id,empid);
+            // Check if the employee ID matches
+            if (atoi(temp.id)==atoi( empid)) {
+                printf("Employee ID matched.\n");
+
+                // Set up the file lock
+                lock.l_start = current_position - strlen(line) - 1;  // Lock the start of the current record (move back for the newline)
+                lock.l_len = strlen(line) + 1;  // Include the length of the current record and the newline
+
+                // Try to obtain the lock
+                if (fcntl(db_fd, F_SETLK, &lock) == -1) {
+                    perror("Error in obtaining lock");
+                    close(db_fd);
+                    return false;
+                }
+
+                // Prepare updated employee data
+                strcpy(data_new.password, temp.password);  // Preserve the old password
+                snprintf(format, sizeof(format), "%s,%s,%s,%s\n", temp.id, temp.password, temp.username, data_new.role);
+
+                // Move file pointer to the start of the current employee record
+                lseek(db_fd, current_position - strlen(line) - 1, SEEK_SET);
+
+                // Write the updated employee record
+                if (write(db_fd, format, strlen(format)) == -1) {
+                    write(cd, "Error in Updating Data", strlen("Error in Updating Data"));
+                    close(db_fd);
+                    return false;
+                }
+
+                // Unlock the file
+                lock.l_type = F_UNLCK;
+                if (fcntl(db_fd, F_SETLK, &lock) == -1) {
+                    perror("Error in releasing the lock");
+                    close(db_fd);
+                    return false;
+                }
+
+                is_there = true;
+                break;
+            }
+        }
+    }
+
+    // Close the file
+    close(db_fd);
+
+    // Handle case where employee is not found
+    if (!is_there) {
+        write(cd, "Employee Not Found", strlen("Employee Not Found"));
+        return false;
+    }
+
+    return true;
 }
-}//end of mange user
+
