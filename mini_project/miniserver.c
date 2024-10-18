@@ -8,7 +8,7 @@
 #include<stdbool.h>
 #include<string.h>
 #include"admin.h"
-#define PORT 5083
+#define PORT 5107
 #define MAX 5
 void *handleclient(void * clientSocket)
 {
