@@ -8,7 +8,7 @@ CFLAGS = -Wall -g
 SRCS = miniserver.c admin.c employee.c
 
 # Header files
-HDRS = admin.h employee.h
+HDRS = admin.h employee.h customer.h
 
 # Output executable
 TARGET = server
