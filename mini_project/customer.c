@@ -15,7 +15,7 @@
 #include "customer.h"
 bool customer_login(int clientSocket);
 bool authenticate_customer(int clientSocket);
-
+bool account_bal(int clientSocket);
 bool customer_login(int clientSocket)
 {printf("hello\n");
 send(clientSocket,"hello\n",strlen("hello\n"),0);
@@ -40,14 +40,14 @@ if(rbytes==-1)
 return false;}
 int choice=atoi(rbuff);
 
-/*switch (choice){
+switch (choice){
         case 1:
-         if(view account balance(clientSocket))
-        {
-        send(clientSocket,"successfuly added\npress enter to continue\n",strlen("successfully added\npress enter to continue\n"),0);
-        }
+         if(account_bal(clientSocket))
+       // {
+       // send(clientSocket,"successfuly added\npress enter to continue\n",strlen("successfully added\npress enter to continue\n"),0);
+       // }
         break;
-        case 2:
+       /* case 2:
                 if(modify_customer(clientSocket))
         {send(clientSocket,"successfully modify\n",strlen("successfully modify\n"),0);}
         break;
@@ -71,8 +71,8 @@ int choice=atoi(rbuff);
                 close(clientSocket);
                 break;
          default:
-                    break;
-}printf("out of switch\n");*/
+                    break;*/
+}printf("out of switch\n");
 fflush(stdout);
 }//while end
 }//authenticate end
@@ -153,6 +153,64 @@ printf("%s,%s\n",temp.id,cid);
 
 }//end of authenticate
 
+bool account_bal(int clientSocket)
+{
+char cid[50];
+char password[10];
+send(clientSocket,"id:\n",strlen("id:\n"),0);
+ssize_t read1=recv(clientSocket,cid,sizeof(cid),0);
+if (read1<=0)
+{
+close (clientSocket);
+return 0;
+}
+if(cid[read1 -1]=='\n')
+{cid[read1 -1]='\0';}
+else
+{cid[read1 -1]='\0';}
+int db_fd = open("customer.txt", O_RDONLY);
+    if (db_fd == -1) {
+        perror("Error in opening the database file");
+        return false;
+    }
+
+    char line[300];
+    struct customer temp;
+    //bool is_there = false;
+
+    //struct flock lock;
+    //memset(&lock, 0, sizeof(lock));
+    //lock.l_type = F_WRLCK;  
+    //lock.l_whence = SEEK_SET;  
+
+    //off_t record_offset = 0;
+    off_t current_position = 0;
+
+    char buffer;
+    int line_index = 0;
+
+    while (read(db_fd, &buffer, 1) > 0) {
+        if (buffer != '\n') {
+            line[line_index++] = buffer;
+        } else {
+            line[line_index] = '\0';
+            line_index = 0;
+
+            current_position = lseek(db_fd, 0, SEEK_CUR);
+                sscanf(line, "%[^,],%[^,],%[^,],%[^,],%d", temp.id, temp.password, temp.username,temp.bal, &temp.active);
+                //temp.active = (is_active_int != 0); 
+                printf("Read customer: ID=%s, Password=%s, Name=%s,Balance=%s, Active=%d\n", temp.id, temp.password, temp.username,temp.bal,temp.active);
 
 
+           // sscanf(line, "%[^,],%[^,],%[^,],%[^,]", temp.id, temp.password, temp.username, &temp.role);
+           // printf("Read Employee: ID=%s, Name=%s, Password=%s, Role=%s\n", temp.id, temp.password, temp.username, temp.role);
+printf("%s,%s\n",temp.id,cid);
+
+            if (atoi(temp.id)==atoi( cid)) {
+                send(clientSocket,temp.bal,sizeof(temp.bal),0);return true;}
+   }//end of else
+}//end of while
+
+
+}//end of account_bal
 
