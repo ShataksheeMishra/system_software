@@ -154,27 +154,27 @@ bool add_customer(int clientSocket)
 {struct customer add;
 //int empid=get_id();
 //add.id=empid;
-send(clientSocket,"enter coustmerid\n",strlen("enter customerid\n"),0);
-int read1=recv(clientSocket,add.id,sizeof(add.id),0);
+write(clientSocket,"enter coustmerid\n",strlen("enter customerid\n"));
+int read1=read(clientSocket,add.id,sizeof(add.id));
 add.id[read1 -1]='\0';
-send(clientSocket,"enter username\n",strlen("enter username\n"),0);
- read1=recv(clientSocket,add.username,sizeof(add.username),0);
+write(clientSocket,"enter username\n",strlen("enter username\n"));
+ read1=read(clientSocket,add.username,sizeof(add.username));
 //add.id[read -1]='\0';
 if(read1<=0)
-{send(clientSocket,"error in fetching username\n",strlen("error in fetching username\n"),0);
+{write(clientSocket,"error in fetching username\n",strlen("error in fetching username\n"));
 return false;}
 add.username[read1-1]='\0';
-send(clientSocket,"enter password\n",strlen("enter password\n"),0);
-read1=recv(clientSocket,add.password,sizeof(add.password),0);
+write(clientSocket,"enter password\n",strlen("enter password\n"));
+read1=read(clientSocket,add.password,sizeof(add.password));
 if(read1<=0)
-{send(clientSocket,"error in fetching password\n",strlen("error in fetching password\n"),0);
+{write(clientSocket,"error in fetching password\n",strlen("error in fetching password\n"));
 return false;}
 add.password[read1-1]='\0';
 
-send(clientSocket,"enter initial balance of customer\n",strlen("enter initial balance of customer\n"),0);
-read1=recv(clientSocket,add.bal,sizeof(add.bal),0);
+write(clientSocket,"enter initial balance of customer\n",strlen("enter initial balance of customer\n"));
+read1=read(clientSocket,add.bal,sizeof(add.bal));
 if(read<=0)
-{send(clientSocket,"error in fetching bal\n",strlen("error in fetching bal\n"),0);
+{write(clientSocket,"error in fetching bal\n",strlen("error in fetching bal\n"));
 return false;}
 add.bal[read1-1]='\0';
 add.active=true;
@@ -256,8 +256,14 @@ struct customer data_new;
                 }
 
                 write(cd, "username:", strlen("username:"));
-                read(cd, data_new.username, sizeof(data_new.username));
-
+              ssize_t read1=  read(cd, data_new.username, sizeof(data_new.username));
+		if(read1<=0)
+{
+		close(cd);exit(1);}
+		if(data_new.username[read1 -1]=='\n')
+			data_new.username[read1 -1]='\0';
+		else
+			data_new.username[read1]='\0';
                  write(cd, "cid", strlen("cid"));
                 ssize_t data_read = read(cd,data_new.id,sizeof(data_new.id));
 
@@ -305,6 +311,11 @@ struct customer data_new;
 
         return true;
 }//end of modify customer
+
+
+
+
+
 
 bool change_password(int cd)
 {printf("inside change password\n");

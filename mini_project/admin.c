@@ -350,12 +350,31 @@ bool modify_employee(int cd) {
     printf("Received Employee ID: %s\n", empid);
 
     write(cd, "Name:", strlen("Name:"));
-    read(cd, data_new.username, sizeof(data_new.username));
+   ssize_t read1=  read(cd, data_new.username, sizeof(data_new.username));
+if(read1<=0)
+{
+                close(cd);exit(1);}
+                if(data_new.username[read1 -1]=='\n')
+                        data_new.username[read1 -1]='\0';
+                else
+                        data_new.username[read1]='\0';
+
 
     write(cd, "ID:", strlen("ID:"));
     read(cd, data_new.id, sizeof(data_new.id));
 	write(cd,"role",strlen("role"));
-	read(cd,data_new.role,sizeof(data_new.role));
+	ssize_t data_read=read(cd,data_new.role,sizeof(data_new.role));
+if (data_read <= 0)
+                {
+                        close(cd);
+                        exit(1);
+                }
+
+                if(data_new.id[data_read-1]=='\n')
+                        data_new.id[data_read-1]='\0';
+                else    
+                        data_new.id[data_read]='\0';
+
 
     int db_fd = open("employee.txt", O_RDWR);
     if (db_fd == -1) {
