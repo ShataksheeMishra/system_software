@@ -9,7 +9,7 @@
 #include<string.h>
 #include"admin.h"
 #include"employee.h"
-#define PORT 5159
+#define PORT 5161
 #define MAX 5
 void *handleclient(void * clientSocket)
 {
@@ -34,6 +34,9 @@ else if(strstr(buff,"customer")!=NULL)
 {customer_login(socket);}
 else if (strstr(buff,"employee")!=NULL)
 {employee_login(socket);}
+else if (strstr(buff,"manager")!=NULL)
+{man_login(socket);}
+
 send(socket,buff,read,0);
 
 }// while end
