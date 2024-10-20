@@ -17,6 +17,7 @@ bool employee_login(int clientSocket);
 bool authenticate_emp(int clientSocket);
 bool add_customer(int cd);
 bool modify_customer(int clientSocket);
+bool change_password(int clientSocket);
 bool employee_login(int clientSocket)
 {printf("hello\n");
 send(clientSocket,"hello\n",strlen("hello\n"),0);
@@ -32,7 +33,7 @@ printf("i am in while\n");
 fflush(stdout);
 ssize_t rbytes;
 char rbuff[1024];
-char menu[]="select the option number \n1.Add new customer\n2.modify customer details\n3.process loan application\n4.process loan\n5.approve reject loans\n6.view assigned loan\n7.change password\n8.logout\n9.exit";
+char menu[]="select the option number \n1.Add new customer\n2.modify customer details\n3.approve reject loans\n4.view assigned loan\n5.change password\n6.logout\n7.exit\n";
 send(clientSocket,menu,strlen(menu),0);
 printf("bye");
 rbytes=recv(clientSocket,rbuff,sizeof(rbuff),0);
@@ -52,25 +53,27 @@ switch (choice){
                 if(modify_customer(clientSocket))
         {send(clientSocket,"successfully modify\n",strlen("successfully modify\n"),0);}
         break;
-       /* case 3:
-                if(manage_user(clientSocket))
-        {send(clientSocket,"success\n",strlen("success\n"),0);}
+       case 3:
+         //       if(manage_user(clientSocket))
+        //{send(clientSocket,"success\n",strlen("success\n"),0);}
         break;
-        case 4:
-                if(change_pass(clientSocket))
+	case 4:
+	break;
+        case 5:
+		printf("inside case 5\n");
+                if(change_password(clientSocket))
         {send(clientSocket,"successfully changed\n",strlen("successfully changed\n"),0);}
 
         break;
-        case 5:
+        case 6:
                 send(clientSocket,"successfully logged out\n",strlen("successfully logged out\n"),0);
                 return true;
         break;
-        case 6:
+        case 7:
                 close(clientSocket);
                 break;
          default:
                     break;
-}*///switch end
 }printf("out of switch\n");
 fflush(stdout);
 }//while end
@@ -302,4 +305,118 @@ struct customer data_new;
 
         return true;
 }//end of modify customer
+
+bool change_password(int cd)
+{printf("inside change password\n");
+struct employee data_new;
+    char empid[10];
+	char password[10];
+    char format[300];
+    char enter_id[] = "enter id";
+
+    write(cd, enter_id, sizeof(enter_id));
+    ssize_t bytes_id = read(cd, empid, sizeof(empid));
+    if (bytes_id == -1) {
+        perror("Error in receiving Employee ID");
+        return false;
+    }
+    printf("Received Employee ID: %s\n", empid);
+write(cd, "old password\n", strlen("old password\n"));
+     bytes_id = read(cd, password, sizeof(password));
+    if (bytes_id == -1) {
+        perror("Error in receiving password");
+        return false;
+    }
+    printf("password: %s\n", password);
+
+
+    write(cd, "new password:", strlen("new password:"));
+    read(cd, data_new.password, sizeof(data_new.password));
+	printf("pass=%s",data_new.password);
+    //write(cd, "ID:", strlen("ID:"));
+    //read(cd, data_new.id, sizeof(data_new.id));
+	//write(cd,"role",strlen("role"));
+	//read(cd,data_new.role,sizeof(data_new.role));
+
+    int db_fd = open("employee.txt", O_RDWR);
+    if (db_fd == -1) {
+        perror("Error in opening the database file");
+        return false;
+    }
+
+    char line[300];
+    struct employee temp;
+    bool is_there = false;
+
+    struct flock lock;
+    memset(&lock, 0, sizeof(lock));
+    lock.l_type = F_WRLCK;  
+    lock.l_whence = SEEK_SET;  
+
+    off_t record_offset = 0;
+    off_t current_position = 0;
+
+    char buffer;
+    int line_index = 0;
+
+    while (read(db_fd, &buffer, 1) > 0) {
+        if (buffer != '\n') {
+            line[line_index++] = buffer;
+        } else {
+            line[line_index] = '\0';
+            line_index = 0;
+
+            current_position = lseek(db_fd, 0, SEEK_CUR);
+
+            sscanf(line, "%[^,],%[^,],%[^,],%[^,]", temp.id, temp.password, temp.username, &temp.role);
+            printf("Read Employee: ID=%s, password=%s, username=%s, Role=%s\n", temp.id, temp.password, temp.username, temp.role);
+printf("%s,%s\n",temp.id,empid);
+            if (atoi(temp.id)==atoi( empid)) {
+                printf("Employee ID matched.\n");
+                lock.l_start = current_position - strlen(line) - 1;
+                lock.l_len = strlen(line) + 1;
+
+                if (fcntl(db_fd, F_SETLK, &lock) == -1) {
+                    perror("Error in obtaining lock");
+                    close(db_fd);
+                    return false;
+                }
+		printf("%s",data_new.password);
+                //strcpy(data_new.password, temp.password);  
+ if (atoi(temp.id)==atoi( empid)&& atoi(temp.password)==atoi(password)){
+                snprintf(format, sizeof(format), "%s,%s,%s,%s\n", temp.id, data_new.password, temp.username, temp.role);
+
+                lseek(db_fd, current_position - strlen(line) - 1, SEEK_SET);
+		printf("%s",data_new.password);
+                if (write(db_fd, format, strlen(format)) == -1) {
+                    write(cd, "Error in Updating Data", strlen("Error in Updating Data"));
+                    close(db_fd);
+                    return false;
+                }
+		printf("updated");
+                lock.l_type = F_UNLCK;
+                if (fcntl(db_fd, F_SETLK, &lock) == -1) {
+                    perror("Error in releasing the lock");
+                    close(db_fd);
+                    return false;
+                }
+
+                is_there = true;
+                break;
+}
+            }
+        }
+    }
+
+    close(db_fd);
+
+    if (!is_there) {
+        write(cd, "Employee Not Found", strlen("Employee Not Found"));
+        return false;
+    }
+
+    return true;
+}
+
+
 
