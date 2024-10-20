@@ -22,6 +22,7 @@ bool transaction(int clientSocket);
 //void update_bal(int amount);
 bool withdraw(int clientSocket);
 bool changepass(int clientSocket);
+bool trans_history(clientSocket);
 bool customer_login(int clientSocket)
 {printf("hello\n");
 send(clientSocket,"hello\n",strlen("hello\n"),0);
@@ -78,6 +79,7 @@ switch (choice){
 	case 7:
 	break;
 	case 8:
+		if(trans_history(clientSocket);
 	break;
         case 9:
                 send(clientSocket,"successfully logged out\n",strlen("successfully logged out\n"),0);
@@ -946,6 +948,73 @@ printf("%s,%s\n",temp.id,empid);
     return true;
 }
 
+bool trans_history(int cd){
+	 struct transaction data_new;
+        char emplid[10];
+        char format[300];
+        char enter_id[] = "-----View Assigned Loan Application Processes-----\nEnter Your ID:";
 
+        write(cd, enter_id, sizeof(enter_id));
+        ssize_t bytes_id = read(cd, emplid, sizeof(emplid));
+        if (bytes_id == -1) {
+                perror("Error in receiving Customer ID");
+                return false;
+        }
+        emplid[bytes_id] = '\0';  
+        printf("Received Customer ID: %s\n", emplid);
+
+        int db_fd = open("loan_db.txt", O_RDWR);
+        if (db_fd == -1) {
+                perror("Error in opening the database file");
+                return false;
+        }
+	 char buffer;
+        int line_index = 0;
+	char transaction_buffer[500];
+char line[300];
+        struct transaction temp;
+        bool is_there = false;
+	off_t current_position = 0;
+	
+
+	while (read(db_fd, &buffer, 1) > 0) {
+        if (buffer != '\n') {
+            line[line_index++] = buffer;
+        }
+
+         else {
+                line[line_index] = '\0';
+                line_index = 0;
+
+                current_position = lseek(db_fd, 0, SEEK_CUR);
+
+                sscanf(line, "%[^,],%[^,],%[^,],%[^,]", temp.sender,temp.rec, temp.amount,temp.flag);
+               // printf("Read Customer: ID=%s, Name=%s, Password=%s, Is Employed=%d\n", temp.id, temp.name, temp.pass, temp.is_empl);
+
+                if (atoi(temp.sender)== emplid ||atoi(temp.rec)==emplid) {
+                        printf("Employee ID matched.\n");
+
+		char temp1[256];
+                snprintf(temp1, sizeof(temp1), "CID: %s,amount:%s,transaction performed:%s\n",temp.sender,temp.amount,temp.flag);
+		
+		 strcat(transaction_buffer, temp1);
+		continue;            
+		
+
+                }
+
+         
+            }}
+	    if(transaction_buffer!=NULL){
+	    write(cd,transaction_buffer,strlen(transaction_buffer));
+	   return true;
+
+        	}
+	    else
+		write(cd,"No Loan Applications Assigned\n",strlen("No Loan Applications Assigned\n"));
+		return false;
+	
+//return true;
+}
 
 
