@@ -14,7 +14,7 @@
 #include "employee.h"
 #include "customer.h"
 #include "transaction.h"
-#include "loan.h";
+#include "loan.h"
 bool customer_login(int clientSocket);
 bool authenticate_customer(int clientSocket);
 bool account_bal(int clientSocket);
@@ -84,7 +84,7 @@ switch (choice){
 	case 7:
 	break;
 	case 8:
-		if(trans_history(clientSocket);
+		if(trans_history(clientSocket));
 	break;
         case 9:
                 send(clientSocket,"successfully logged out\n",strlen("successfully logged out\n"),0);
@@ -332,7 +332,7 @@ struct customer data_new;
                 sscanf(line, "%[^,],%[^,],%[^,],%[^,],%d", temp.id, temp.password, temp.username,temp.bal, &is_active_int);
                 temp.active = (is_active_int != 0); 
                 printf("Read customer: ID=%s, Password=%s, Name=%s,Balance=%s, Active=%d\n", temp.id, temp.password, temp.username,temp.bal,temp.active);
-
+		printf("%s,%s\n",temp.id,cid);
                 if (atoi(temp.id)==atoi( cid)) {
                         printf("customer is matched.\n");
 
@@ -994,15 +994,16 @@ char line[300];
                 current_position = lseek(db_fd, 0, SEEK_CUR);
 
                 sscanf(line, "%[^,],%[^,],%[^,],%[^,]", temp.sender,temp.rec, temp.amount,temp.flag);
-               // printf("Read Customer: ID=%s, Name=%s, Password=%s, Is Employed=%d\n", temp.id, temp.name, temp.pass, temp.is_empl);
+                printf("Read Customer: s=%s, r=%s, a=%s, f=%s\n", temp.sender, temp.rec, temp.amount, temp.flag);
 
-                if (atoi(temp.sender)== emplid ||atoi(temp.rec)==emplid) {
+                if (atoi(temp.sender)==atoi(emplid) ||atoi(temp.rec)==atoi(emplid)) {
                         printf("Employee ID matched.\n");
 
 		char temp1[256];
                 snprintf(temp1, sizeof(temp1), "CID: %s,amount:%s,transaction performed:%s\n",temp.sender,temp.amount,temp.flag);
-		
+		printf("added in temp\n");
 		 strcat(transaction_buffer, temp1);
+		printf("concatinated in buffer\n");
 		continue;            
 		
 
@@ -1029,23 +1030,23 @@ bool apply_loan(int cd){
         char buf_id[]="customer id:\n";
         write(cd,buf_id,sizeof(buf_id));
 
-        int bytes_id=read(cd,l.cust_id,sizeof(l.cust_id));
+        int bytes_id=read(cd,l.cid,sizeof(l.cid));
         if(bytes_id<=0){
                 write(cd,"Error in receiving data from client\n",strlen("Error in receiving data from client\n"));
                 return false;
         }
-        l.cust_id[bytes_id]='\0';
-        if(l.cust_id[bytes_id-1]=='\n'){
-                l.cust_id[bytes_id-1]='\0';
+        l.cid[bytes_id]='\0';
+        if(l.cid[bytes_id-1]=='\n'){
+                l.cid[bytes_id-1]='\0';
         }
 
 	
-	l.status=0;
+	l.stat=0;
 	//strcmp(l.empl_id,"EEEEE");
 
-        FILE *file=fopen("loan_db.txt","a");
+        FILE *file=fopen("loan.txt","a");
         if(file!=NULL){
-                fprintf(file,"%s,%d,%s\n",l.cust_id,l.status,"EE");
+                fprintf(file,"%s,%s,%d\n",l.cid,"e",l.stat);
                 fclose(file);
                 printf("true\n");
                 fflush(stdout);

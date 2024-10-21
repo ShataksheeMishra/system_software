@@ -23,11 +23,11 @@ void update_id(int id);
 int read_id();
 bool modify_employee(int clientSocket);
 bool manage_user(int clientSocket);
-struct Credentials
-{
-char username[50];
-char password[10];
-};
+//struct Credentials
+//{
+//char username[50];
+//char password[10];
+//};
 bool admin_login(int clientSocket)
 {printf("hello\n");
 send(clientSocket,"hello\n",strlen("hello\n"),0);

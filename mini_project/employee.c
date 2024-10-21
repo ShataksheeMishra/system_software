@@ -503,7 +503,7 @@ bool process_loan(int cd){
                 }
 		
 		if(ch=='1'){
-			data_new.status=2;
+			data_new.stat=2;
 			write(cd,"Loan Approved\n",strlen("Loan Approved\n"));
 		}
 		else{

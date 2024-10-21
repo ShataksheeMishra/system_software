@@ -1,3 +1,4 @@
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -43,18 +44,18 @@ int choice=atoi(rbuff);
 
 switch (choice){
         case 1:
-         if(change_active(clientSocket))
-        {
-        send(clientSocket,"successfuly added\npress enter to continue\n",strlen("successfully added\npress enter to continue\n"),0);
-        }
+       //  if(change_active(clientSocket))
+        //{
+        //send(clientSocket,"successfuly added\npress enter to continue\n",strlen("successfully added\npress enter to continue\n"),0);
+       // }
         break;
         case 2:
                 if(assign_loan(clientSocket))
         {send(clientSocket,"successfully modify\n",strlen("successfully modify\n"),0);}
         break;
        case 3:
-                if(review_feed(clientSocket))
-        {send(clientSocket,"success\n",strlen("success\n"),0);}
+         //       if(review_feed(clientSocket))
+       // {send(clientSocket,"success\n",strlen("success\n"),0);}
         break;
 	case 4:
 		if(change_password(clientSocket))
@@ -70,7 +71,7 @@ switch (choice){
                 break;
          default:
                     break;
-}*/printf("out of switch\n");
+}printf("out of switch\n");
 fflush(stdout);
 }//while end
 }//authenticate end
@@ -160,7 +161,7 @@ bool assign_loan(int cd){
         custid[bytes_id] = '\0';  
         printf("Received Customer ID: %s\n", custid);
 
-        int db_fd = open("loan_db.txt", O_RDWR);
+        int db_fd = open("loan.txt", O_RDWR);
         if (db_fd == -1) {
                 perror("Error in opening the database file");
                 return false;
@@ -191,10 +192,10 @@ bool assign_loan(int cd){
 
                 current_position = lseek(db_fd, 0, SEEK_CUR);
 
-                sscanf(line, "%[^,],%d,%[^,]", temp.cust_id,&temp.status, temp.empl_id);
+                sscanf(line, "%[^,],%[^,],%d", temp.cid,temp.eid,&temp.stat);
                // printf("Read Customer: ID=%s, Name=%s, Password=%s, Is Employed=%d\n", temp.id, temp.name, temp.pass, temp.is_empl);
 
-                if (strcmp(temp.cust_id, custid) == 0) {
+                if (strcmp(temp.cid, custid) == 0) {
                         printf("Customer ID matched.\n");
 
                 lock.l_start = current_position - strlen(line) - 1;  
@@ -207,21 +208,21 @@ bool assign_loan(int cd){
                 }
 
                 write(cd, "Enter Employee ID:", strlen("Enter Employee ID:"));
-                ssize_t data_read1=read(cd, data_new.empl_id, sizeof(data_new.empl_id));
+                ssize_t data_read1=read(cd, data_new.eid, sizeof(data_new.eid));
                 if (data_read1 <= 0)
                 {
                         close(cd);
                         exit(1);
                 }
 
-                if(data_new.empl_id[data_read1-1]=='\n')
-                        data_new.empl_id[data_read1-1]='\0';
+                if(data_new.eid[data_read1-1]=='\n')
+                        data_new.eid[data_read1-1]='\0';
                 else    
-                        data_new.empl_id[data_read1]='\0';
+                        data_new.eid[data_read1]='\0';
 
 
-		data_new.status=1;//Means empl is assigned
-		snprintf(format, sizeof(format), "%s,%d,%s\n", temp.cust_id, data_new.status, data_new.empl_id);
+		data_new.stat=1;//Means empl is assigned
+		snprintf(format, sizeof(format), "%s,%s,%d\n", temp.cid,data_new.eid, data_new.stat);
 
                 lseek(db_fd, current_position - strlen(line) - 1, SEEK_SET);
 

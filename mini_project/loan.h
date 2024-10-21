@@ -1,3 +1,4 @@
+
 #ifndef LOAN
 #define LOAN
 struct loan
