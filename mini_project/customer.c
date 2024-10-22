@@ -15,11 +15,13 @@
 #include "customer.h"
 #include "transaction.h"
 #include "loan.h"
+#include "feedback.h"
 bool customer_login(int clientSocket);
 bool authenticate_customer(int clientSocket);
 bool account_bal(int clientSocket);
 bool deposit(int clientSocket);
 bool transaction(int clientSocket);
+bool feed_back(int clientSocket);
 //void update_bal(int amount);
 bool withdraw(int clientSocket);
 bool changepass(int clientSocket);
@@ -82,6 +84,7 @@ switch (choice){
 
         break;
 	case 7:
+		if(feed_back(clientSocket));
 	break;
 	case 8:
 		if(trans_history(clientSocket));
@@ -244,21 +247,22 @@ struct transaction add;
 //add.id=empid;
 write(cd,"enter senderid\n",strlen("enter senderid\n"));
 int read1=read(cd,add.sender,sizeof(add.sender));
-add.sender[read1 -1]='\0';
-write(cd,"enter receiver\n",strlen("enter receiver\n"));
- read1=read(cd,add.rec,sizeof(add.rec));
+add.sender[read1]='\0';
+//write(cd,"enter receiver\n",strlen("enter receiver\n"));
+ //read1=read(cd,add.rec,sizeof(add.rec));
 //add.id[read -1]='\0';
-if(read1<=0)
-{send(cd,"error in receiver\n",strlen("error in receiver\n"),0);
-return false;}
-add.rec[read1-1]='\0';
+//if(read1<=0)
+//{send(cd,"error in receiver\n",strlen("error in receiver\n"),0);
+//return false;}
+//add.rec[read1]='\0';
+strcpy(add.rec,add.sender);
 write(cd,"enter amount\n",strlen("enter amount\n"));
 read1=read(cd,add.amount,sizeof(add.amount));
 int amount=atoi(add.amount);printf("amounttran%d\n",amount);
 if(read1<=0)
 {send(cd,"error in amount\n",strlen("error in amount\n"),0);
 return false;}
-add.amount[read1-1]='\0';
+add.amount[read1]='\0';
 
 //send(clientSocket,"enter initial balance of customer\n",strlen("enter initial balance of customer\n"),0);
 //read1=recv(clientSocket,add.bal,sizeof(add.bal),0);
@@ -284,18 +288,18 @@ return false;
 }
 
 struct customer data_new;
-        char cid[10];
+        //char cid[10];
         char format[300];
-        char enter_id[] = "Enter sender id:";
+        //char enter_id[] = "Enter sender id:";
 
-        write(cd, enter_id, sizeof(enter_id));
-        ssize_t bytes_id = read(cd, cid, sizeof(cid));
-        if (bytes_id == -1) {
-                perror("Error in receiving customer id");
-                return false;
-        }
-        cid[bytes_id] = '\0';  
-        printf("Received customer id: %s\n", cid);
+        //write(cd, enter_id, sizeof(enter_id));
+        //ssize_t bytes_id = read(cd, cid, sizeof(cid));
+        //if (bytes_id == -1) {
+          //      perror("Error in receiving customer id");
+            //    return false;
+        //}
+        //cid[bytes_id] = '\0';  
+        printf("Received customer id: %s\n", add.sender);
 
         int db_fd = open("customer.txt", O_RDWR);
         if (db_fd == -1) {
@@ -332,8 +336,8 @@ struct customer data_new;
                 sscanf(line, "%[^,],%[^,],%[^,],%[^,],%d", temp.id, temp.password, temp.username,temp.bal, &is_active_int);
                 temp.active = (is_active_int != 0); 
                 printf("Read customer: ID=%s, Password=%s, Name=%s,Balance=%s, Active=%d\n", temp.id, temp.password, temp.username,temp.bal,temp.active);
-		printf("%s,%s\n",temp.id,cid);
-                if (atoi(temp.id)==atoi( cid)) {
+		printf("%s,%s\n",temp.id,add.sender);
+                if (atoi(temp.id)==atoi(add.sender)) {
                         printf("customer is matched.\n");
 
                 lock.l_start = current_position - strlen(line) - 1;  
@@ -411,21 +415,22 @@ struct transaction add;
 //add.id=empid;
 write(cd,"enter senderid\n",strlen("enter senderid\n"));
 int read1=read(cd,add.sender,sizeof(add.sender));
-add.sender[read1 -1]='\0';
-write(cd,"enter receiver\n",strlen("enter receiver\n"));
- read1=read(cd,add.rec,sizeof(add.rec));
+add.sender[read1]='\0';
+//write(cd,"enter receiver\n",strlen("enter receiver\n"));
+ //read1=read(cd,add.rec,sizeof(add.rec));
 //add.id[read -1]='\0';
-if(read1<=0)
-{send(cd,"error in receiver\n",strlen("error in receiver\n"),0);
-return false;}
-add.rec[read1-1]='\0';
+//if(read1<=0)
+//{send(cd,"error in receiver\n",strlen("error in receiver\n"),0);
+//return false;}
+//add.rec[read1-1]='\0';
+strcpy(add.rec,add.sender);
 write(cd,"enter amount\n",strlen("enter amount\n"));
 read1=read(cd,add.amount,sizeof(add.amount));
 int amount=atoi(add.amount);printf("amounttran%d\n",amount);
 if(read1<=0)
 {send(cd,"error in amount\n",strlen("error in amount\n"),0);
 return false;}
-add.amount[read1-1]='\0';
+add.amount[read1]='\0';
 
 //send(clientSocket,"enter initial balance of customer\n",strlen("enter initial balance of customer\n"),0);
 //read1=recv(clientSocket,add.bal,sizeof(add.bal),0);
@@ -451,18 +456,18 @@ return false;
 }
 
 struct customer data_new;
-        char cid[10];
+        //char cid[10];
         char format[300];
-        char enter_id[] = "Enter sender id:";
+        //char enter_id[] = "Enter sender id:";
 
-        write(cd, enter_id, sizeof(enter_id));
-        ssize_t bytes_id = read(cd, cid, sizeof(cid));
-        if (bytes_id == -1) {
-                perror("Error in receiving customer id");
-                return false;
-        }
-        cid[bytes_id] = '\0';  
-        printf("Received customer id: %s\n", cid);
+        //write(cd, enter_id, sizeof(enter_id));
+        //ssize_t bytes_id = read(cd, cid, sizeof(cid));
+        //if (bytes_id == -1) {
+          //      perror("Error in receiving customer id");
+            //    return false;
+       // }
+       // cid[bytes_id] = '\0';  
+       // printf("Received customer id: %s\n", cid);
 
         int db_fd = open("customer.txt", O_RDWR);
         if (db_fd == -1) {
@@ -500,7 +505,7 @@ struct customer data_new;
                 temp.active = (is_active_int != 0); 
                 printf("Read customer: ID=%s, Password=%s, Name=%s,Balance=%s, Active=%d\n", temp.id, temp.password, temp.username,temp.bal,temp.active);
 
-                if (atoi(temp.id)==atoi( cid)) {
+                if (atoi(temp.id)==atoi(add.sender)) {
                         printf("customer is matched.\n");
 
                 lock.l_start = current_position - strlen(line) - 1;  
@@ -578,21 +583,21 @@ struct transaction add;
 //add.id=empid;
 write(cd,"enter senderid\n",strlen("enter senderid\n"));
 int read1=read(cd,add.sender,sizeof(add.sender));
-add.sender[read1 -1]='\0';
+add.sender[read1]='\0';
 write(cd,"enter receiver\n",strlen("enter receiver\n"));
  read1=read(cd,add.rec,sizeof(add.rec));
 //add.id[read -1]='\0';
 if(read1<=0)
 {write(cd,"error in receiver\n",strlen("error in receiver\n"));
 return false;}
-add.rec[read1-1]='\0';
+add.rec[read1]='\0';
 write(cd,"enter amount\n",strlen("enter amount\n"));
 read1=read(cd,add.amount,sizeof(add.amount));
 int amount=atoi(add.amount);printf("amounttran%d\n",amount);
 if(read1<=0)
 {write(cd,"error in amount\n",strlen("error in amount\n"));
 return false;}
-add.amount[read1-1]='\0';
+add.amount[read1]='\0';
 
 //send(clientSocket,"enter initial balance of customer\n",strlen("enter initial balance of customer\n"),0);
 //read1=recv(clientSocket,add.bal,sizeof(add.bal),0);
@@ -618,18 +623,18 @@ return false;
 }
 
 struct customer data_new;
-        char cid[10];
+        //char cid[10];
         char format[300];
-        char enter_id[] = "Enter sender id:";
+        //char enter_id[] = "Enter sender id:";
 
-        write(cd, enter_id, sizeof(enter_id));
-        ssize_t bytes_id = read(cd, cid, sizeof(cid));
-        if (bytes_id == -1) {
-                perror("Error in receiving customer id");
-                return false;
-        }
-        cid[bytes_id] = '\0';  
-        printf("Received customer id: %s\n", cid);
+        //write(cd, enter_id, sizeof(enter_id));
+        //ssize_t bytes_id = read(cd, cid, sizeof(cid));
+        //if (bytes_id == -1) {
+          //      perror("Error in receiving customer id");
+            //    return false;
+        //}
+        //cid[bytes_id] = '\0';  
+        //printf("Received customer id: %s\n", cid);
 
         int db_fd = open("customer.txt", O_RDWR);
         if (db_fd == -1) {
@@ -667,7 +672,7 @@ struct customer data_new;
                 temp.active = (is_active_int != 0); 
                 printf("Read customer: id=%s, Password=%s, Username=%s,Balance=%s, Active=%d\n", temp.id, temp.password, temp.username,temp.bal,temp.active);
 
-                if (atoi(temp.id)==atoi( cid)) {
+                if (atoi(temp.id)==atoi(add.sender)) {
                         printf("customer is matched.\n");
 
                 lock.l_start = current_position - strlen(line) - 1;  
@@ -713,18 +718,18 @@ struct customer data_new;
         }
 
         struct customer data_new1;
-        char cid1[10];
+        //char cid1[10];
         char format1[300];
-        char enter_id1[] = "Enter customer id:";
+       // char enter_id1[] = "Enter customer id:";
 
-        write(cd, enter_id1, sizeof(enter_id1));
-        ssize_t bytes_id1 = read(cd, cid1, sizeof(cid1));
-        if (bytes_id1 == -1) {
-                perror("Error in receiving customer id");
-                return false;
-        }
-        cid1[bytes_id1] = '\0';  
-        printf("Received customer id: %s\n", cid1);
+        //write(cd, enter_id1, sizeof(enter_id1));
+        //ssize_t bytes_id1 = read(cd, cid1, sizeof(cid1));
+        //if (bytes_id1 == -1) {
+          //      perror("Error in receiving customer id");
+            //    return false;
+        //}
+        //cid1[bytes_id1] = '\0';  
+        //printf("Received customer id: %s\n", cid1);
 
         int db_fd1 = open("customer.txt", O_RDWR);
         if (db_fd1 == -1) {
@@ -762,7 +767,7 @@ struct customer data_new;
                 temp1.active = (is_active_int1 != 0); 
                 printf("Read customer: ID=%s, Password=%s, Name=%s,Balance=%s, Active=%d\n", temp1.id, temp1.password, temp1.username,temp1.bal,temp1.active);
 
-                if (atoi(temp1.id)==atoi( cid1)) {
+                if (atoi(temp1.id)==atoi(add.rec)) {
                         printf("customer is matched.\n");
 
                 lock1.l_start = current_position1 - strlen(line1) - 1;  
@@ -848,6 +853,7 @@ struct customer data_new;
         perror("Error in receiving Employee ID");
         return false;
     }
+	   empid[bytes_id] = '\0'; 
     printf("Received Employee ID: %s\n", empid);
 write(cd, "old password\n", strlen("old password\n"));
      bytes_id = read(cd, password, sizeof(password));
@@ -856,16 +862,17 @@ write(cd, "old password\n", strlen("old password\n"));
         return false;
     }
     printf("password: %s\n", password);
+	   password[bytes_id] = '\0'; 
 
 
     write(cd, "new password:", strlen("new password:"));
-    read(cd, data_new.password, sizeof(data_new.password));
+    bytes_id=read(cd, data_new.password, sizeof(data_new.password));
 	printf("pass=%s",data_new.password);
     //write(cd, "ID:", strlen("ID:"));
     //read(cd, data_new.id, sizeof(data_new.id));
 	//write(cd,"role",strlen("role"));
 	//read(cd,data_new.role,sizeof(data_new.role));
-
+	   data_new.password[bytes_id] = '\0'; 
     int db_fd = open("customer.txt", O_RDWR);
     if (db_fd == -1) {
         perror("Error in opening the database file");
@@ -1060,3 +1067,32 @@ bool apply_loan(int cd){
 }//end of loan
 
 
+bool feed_back(int cd)
+{
+struct feedback add;
+write(cd,"enter cid\n",strlen("enter cid\n"));
+int read1=read(cd,add.id,sizeof(add.id));
+add.id[read1]='\0';
+write(cd,"enter feedback\n",strlen("enter feedback\n"));
+ read1=read(cd,add.feed,sizeof(add.feed));
+//add.id[read -1]='\0';
+if(read1<=0)
+{send(cd,"error in feedback\n",strlen("error in feedback\n"),0);
+return false;}
+add.feed[read1]='\0';
+FILE *file=fopen("feedback.txt","a");
+if(file!=NULL)
+{fprintf(file,"%s,%s\n",add.id,add.feed);
+fclose(file);
+printf("true\n");
+fflush(stdout);
+return true;}
+else{
+perror("can not open employee file");
+printf("false\n");
+fflush(stdout);
+return false;
+}
+
+
+}//end of feedback

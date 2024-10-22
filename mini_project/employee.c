@@ -19,6 +19,8 @@ bool authenticate_emp(int clientSocket);
 bool add_customer(int cd);
 bool process_loan(int clientSocket);
 bool modify_customer(int clientSocket);
+bool process_loan(int clientSocket);
+bool view_loan( int clientSocket);
 bool change_password(int clientSocket);
 bool employee_login(int clientSocket)
 {printf("hello\n");
@@ -57,9 +59,10 @@ switch (choice){
         break;
        case 3:
                 if(process_loan(clientSocket))
-        //{send(clientSocket,"success\n",strlen("success\n"),0);}
+        {send(clientSocket,"success\n",strlen("success\n"),0);}
         break;
 	case 4:
+		if(view_loan(clientSocket))		
 	break;
         case 5:
 		printf("inside case 5\n");
@@ -142,7 +145,7 @@ int db_fd = open("employee.txt", O_RDONLY);
             current_position = lseek(db_fd, 0, SEEK_CUR);
 
             sscanf(line, "%[^,],%[^,],%[^,],%[^,]", temp.id, temp.password, temp.username, &temp.role);
-            printf("Read Employee: ID=%s, Password=%s, Username=%s, Role=%s\n", temp.id, temp.password, temp.username, temp.role);
+             printf("Read Employee: ID=%s, Password=%s, Username=%s, Role=%s\n", temp.id, temp.password, temp.username, temp.role);
 printf("%s,%s\n",temp.id,empid);
 
             if (atoi(temp.id)==atoi( empid)&& atoi(temp.password)==atoi(password)) {
@@ -444,17 +447,17 @@ bool process_loan(int cd){
         }	
 	
         custid[bytes_id] = '\0';  
-        printf("Received Customer ID: %s\n", custid);
+        printf("*Received Customer ID: %s\n", custid);
 
-	char ch;
-        char ch_prompt="Press 1 to Approve 0 to Reject:";
+	char ch[2];
+        char ch_prompt[]="Press 1 to Approve 0 to Reject:";
 	 write(cd, ch_prompt, sizeof(ch_prompt));
         ssize_t bytes_ch = read(cd, ch, sizeof(ch));
         if (bytes_ch == -1) {
                 perror("Error");
                 return false;
         }
-       // ch[bytes_ch] = '\0';  
+        ch[bytes_ch] = '\0';  
 
         int db_fd = open("loan.txt", O_RDWR);
         if (db_fd == -1) {
@@ -490,7 +493,7 @@ bool process_loan(int cd){
                 
                 sscanf(line, "%[^,],%[^,],%d", temp.cid,temp.eid,&temp.stat);
 
-                if (strcmp(temp.cid, custid) == 0) {
+                if (atoi(temp.cid)==atoi(custid) == 0) {
                         printf("Customer ID matched.\n");
 
                 lock.l_start = current_position - strlen(line) - 1;  
@@ -502,12 +505,12 @@ bool process_loan(int cd){
                         return false;
                 }
 		
-		if(ch=='1'){
+		if(atoi(ch)==1){
 			data_new.stat=2;
 			write(cd,"Loan Approved\n",strlen("Loan Approved\n"));
 		}
 		else{
-			
+			data_new.stat=1;
                         write(cd,"Loan Rejected\n",strlen("Loan Rejected\n"));
                 }
 	
@@ -546,5 +549,75 @@ bool process_loan(int cd){
 
 }//end of process_loan
 
+bool view_loan(int cd)
+{
+struct loan data_new;
+        char emplid[10];
+        char format[300];
+        char enter_id[] = "Enter Your ID:";
+
+        write(cd, enter_id, sizeof(enter_id));
+        ssize_t bytes_id = read(cd, emplid, sizeof(emplid));
+        if (bytes_id == -1) {
+                perror("Error in receiving Employee ID");
+                return false;
+        }
+        emplid[bytes_id] = '\0';  
+        printf("Received Employee ID: %s\n", emplid);
+
+        int db_fd = open("loan.txt", O_RDWR);
+        if (db_fd == -1) {
+                perror("Error in opening the database file");
+                return false;
+        }
+	 char buffer;
+        int line_index = 0;
+	char transaction_buffer[500];
+
+	char line[300];
+        struct loan temp;
+        bool is_there = false;
+	off_t current_position = 0;
+	
+
+	while (read(db_fd, &buffer, 1) > 0) {
+        if (buffer != '\n') {
+            line[line_index++] = buffer;
+        }
+
+         else {
+                line[line_index] = '\0';
+                line_index = 0;
+
+                current_position = lseek(db_fd, 0, SEEK_CUR);
+
+                sscanf(line, "%[^,],%[^,],%d", temp.cid,temp.eid,&temp.stat);
+                printf("Read Customer: ID=%s, Employee= %s, status=%d\n", temp.cid,temp.eid,&temp.stat);
+
+                if (atoi(temp.eid)==atoi(emplid)) {
+                        printf("Employee ID matched.\n");
+
+		char temp1[256];
+                snprintf(temp1, sizeof(temp1), "CID: %s\n",temp.cid);
+		
+		 strcat(transaction_buffer, temp1);
+		continue;            
+		
+
+                }
+
+         
+            }}
+	    if(transaction_buffer!=NULL){
+	    write(cd,transaction_buffer,strlen(transaction_buffer));
+	   return true;
+
+        	}
+	    else
+		write(cd,"No Loan Applications Assigned\n",strlen("No Loan Applications Assigned\n"));
+		return false;
+	
+//return true;
+}
 
 

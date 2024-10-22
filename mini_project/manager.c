@@ -1,4 +1,3 @@
-
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -15,9 +14,12 @@
 #include "employee.h"
 #include "customer.h"
 #include "loan.h"
+#include "feedback.h"
+bool change_active(int clientSocket);
 bool man_login(int clientSocket);
 bool authenticate_man(int clientSocket);
 bool assign_loan(int clientSocket);
+bool review_feed(int clientSocket);
 bool man_login(int clientSocket)
 {printf("hello\n");
 send(clientSocket,"hello\n",strlen("hello\n"),0);
@@ -33,7 +35,7 @@ printf("i am in while\n");
 fflush(stdout);
 ssize_t rbytes;
 char rbuff[1024];
-char menu[]="select the option number \n1.activate/deactivate\n2.assign loan process to emp\n3.reviw feedback.\n4.change password\n5.logout\n6.exit\n";
+char menu[]="select the option number \n1.activate/deactivate\n2.assign loan process to emp\n3.review feedback.\n4.change password\n5.logout\n6.exit\n";
 send(clientSocket,menu,strlen(menu),0);
 printf("bye");
 rbytes=recv(clientSocket,rbuff,sizeof(rbuff),0);
@@ -44,18 +46,18 @@ int choice=atoi(rbuff);
 
 switch (choice){
         case 1:
-       //  if(change_active(clientSocket))
-        //{
-        //send(clientSocket,"successfuly added\npress enter to continue\n",strlen("successfully added\npress enter to continue\n"),0);
-       // }
+         if(change_active(clientSocket))
+        {
+        send(clientSocket,"successfuly added\npress enter to continue\n",strlen("successfully added\npress enter to continue\n"),0);
+        }
         break;
         case 2:
                 if(assign_loan(clientSocket))
         {send(clientSocket,"successfully modify\n",strlen("successfully modify\n"),0);}
         break;
        case 3:
-         //       if(review_feed(clientSocket))
-       // {send(clientSocket,"success\n",strlen("success\n"),0);}
+                if(review_feed(clientSocket))
+        {send(clientSocket,"success\n",strlen("success\n"),0);}
         break;
 	case 4:
 		if(change_password(clientSocket))
@@ -150,7 +152,7 @@ bool assign_loan(int cd){
 	struct loan data_new;
         char custid[10];
         char format[300];
-        char enter_id[] = "enter eid:";
+        char enter_id[] = "enter cid:";
 
         write(cd, enter_id, sizeof(enter_id));
         ssize_t bytes_id = read(cd, custid, sizeof(custid));
@@ -193,9 +195,9 @@ bool assign_loan(int cd){
                 current_position = lseek(db_fd, 0, SEEK_CUR);
 
                 sscanf(line, "%[^,],%[^,],%d", temp.cid,temp.eid,&temp.stat);
-               // printf("Read Customer: ID=%s, Name=%s, Password=%s, Is Employed=%d\n", temp.id, temp.name, temp.pass, temp.is_empl);
+                printf("Read Customer: cid=%s, eid=%s, stat=%d\n", temp.cid, temp.eid, temp.stat);
 
-                if (strcmp(temp.cid, custid) == 0) {
+                if (atoi(temp.cid)==atoi(custid)) {
                         printf("Customer ID matched.\n");
 
                 lock.l_start = current_position - strlen(line) - 1;  
@@ -255,3 +257,207 @@ bool assign_loan(int cd){
         return true;
 
 }//end of assign loan
+bool review_feed(int cd)
+{
+//struct transaction data_new;
+        char emplid[10];
+        //char format[300];
+        char enter_id[] = "Enter cid:";
+
+        write(cd, enter_id, sizeof(enter_id));
+        ssize_t bytes_id = read(cd, emplid, sizeof(emplid));
+        if (bytes_id == -1) {
+                perror("Error in receiving customer id");
+                return false;
+        }
+        emplid[bytes_id] = '\0';  
+        printf("Received customer id: %s\n", emplid);
+
+        int db_fd = open("feedback.txt", O_RDWR);
+        if (db_fd == -1) {
+                perror("Error in opening the database file");
+                return false;
+        }
+	 char buffer;
+        int line_index = 0;
+	char transaction_buffer[500];
+char line[300];
+        struct feedback temp;
+        bool is_there = false;
+	off_t current_position = 0;
+	
+
+	while (read(db_fd, &buffer, 1) > 0) {
+        if (buffer != '\n') {
+            line[line_index++] = buffer;
+        }
+
+         else {
+                line[line_index] = '\0';
+                line_index = 0;
+
+                current_position = lseek(db_fd, 0, SEEK_CUR);
+
+                sscanf(line, "%[^,],%[^,]", temp.id,temp.feed);
+                printf("Read Customer: s=%s, r=%s\n", temp.id, temp.feed);
+
+                if (atoi(temp.id)==atoi(emplid)) {
+                        printf("Customer ID matched.\n");
+
+		char temp1[256];
+                snprintf(temp1, sizeof(temp1), "CID: %s,review:%s\n",temp.id,temp.feed);
+		printf("added in temp\n");
+		 strcat(transaction_buffer, temp1);
+		printf("concatinated in buffer\n");
+		continue;            
+		
+
+                }
+
+         
+            }}
+	    if(transaction_buffer!=NULL){
+	    write(cd,transaction_buffer,strlen(transaction_buffer));
+	   return true;
+
+        	}
+	    else
+		write(cd,"No feedback\n",strlen("No feedback\n"));
+		return false;
+
+}//end of review
+bool change_active(int cd)
+{
+struct customer data_new;
+        char custid[10];
+        char format[300];
+        char enter_id[] = "Enter id of the Customer:";
+
+        write(cd, enter_id, sizeof(enter_id));
+        ssize_t bytes_id = read(cd, custid, sizeof(custid));
+        if (bytes_id == -1) {
+                perror("Error in receiving Customer ID");
+                return false;
+        }
+        custid[bytes_id] = '\0';  
+        printf("Received Customer ID: %s\n", custid);
+
+        int db_fd = open("customer.txt", O_RDWR);
+        if (db_fd == -1) {
+                perror("Error in opening the database file");
+                return false;
+        }
+
+        char line[300];
+        struct customer temp;
+        bool is_there = false;
+
+        struct flock lock;
+        memset(&lock, 0, sizeof(lock));
+        lock.l_type = F_WRLCK;  
+        lock.l_whence = SEEK_SET;  
+
+        off_t current_position = 0;
+
+         char buffer;
+        int line_index = 0;
+
+        while (read(db_fd, &buffer, 1) > 0) {
+        if (buffer != '\n') {
+            line[line_index++] = buffer;
+        }
+         else {
+                line[line_index] = '\0';
+                line_index = 0;
+
+                current_position = lseek(db_fd, 0, SEEK_CUR);
+
+                int active_int;
+                sscanf(line, "%[^,],%[^,],%[^,],%[^,],%d", temp.id, temp.password, temp.username, temp.bal,&active_int);
+                temp.active = (active_int != 0); 
+
+                if (atoi(temp.id)==atoi(custid)) {
+                        printf("Customer ID matched.\n");
+
+                lock.l_start = current_position - strlen(line) - 1;  
+                lock.l_len = strlen(line); 
+
+                if (fcntl(db_fd, F_SETLKW, &lock) == -1) {
+                         perror("Error in obtaining lock");
+                        close(db_fd);
+                        return false;
+                }
+
+		char ch[2];
+		if(temp.active==1){
+			write(cd,"Customer Account is Active. Do you want to Deactivate the Account?\nPress 1 or 0:",strlen("Customer Account is Active. Do you want to Deactivate the Account?\nPress 1 or 0:")); 
+        		ssize_t bytes_ch = read(cd, ch, sizeof(ch));
+        		if (bytes_ch == -1) {
+                		perror("Error in receiving");
+                		return false;
+        		}
+        		ch[bytes_ch] = '\0';
+			if(atoi(ch)==1){
+				data_new.active=0;
+				write(cd," Account Deactivated",strlen(" Account Deactivated"));  
+			}
+			else{
+				write(cd,"No Change",strlen("No Change"));
+				data_new.active=1;
+			}
+		}
+		
+		else{
+                        write(cd,"Customer Account is Deactive. Do you want to Activate the Account?\nPress 1 or 0:",strlen("Customer Account is Deactive. Do you want to Activate the Account\nPress 1 or 0"));
+                        ssize_t bytes_ch = read(cd, ch, sizeof(ch));
+                        if (bytes_ch == -1) {
+                                perror("Error in receiving");
+                                return false;
+                        }
+                        ch[bytes_ch] = '\0';
+                        if(atoi(ch)==1){
+                                data_new.active=1;
+                                write(cd," Account Activated",strlen(" Account Activated"));  
+                        }
+                        else{
+                                write(cd,"No Change",strlen("No Change"));
+                                data_new.active=0;
+                        }
+                }
+
+
+
+                snprintf(format, sizeof(format), "%s,%s,%s,%s,%d\n", temp.id, temp.password, temp.username,temp.bal,data_new.active);
+
+                lseek(db_fd, current_position - strlen(line) - 1, SEEK_SET);
+
+                if (write(db_fd, format, strlen(format)) == -1) {
+                        write(cd, "Error in Updating Data", strlen("Error in Updating Data"));
+                        close(db_fd);
+                        return false;
+                }
+
+                lock.l_type = F_UNLCK;
+                if (fcntl(db_fd, F_SETLK, &lock) == -1) {
+                        perror("Error in releasing the lock");
+                        close(db_fd);
+                        return false;
+                }
+
+                is_there = true;
+                break;
+            }
+        }
+    }
+
+        close(db_fd);
+
+        if (!is_there) {
+                write(cd, "Employee Not Found", strlen("Employee Not Found"));
+                return false;
+        }
+
+	return true;
+
+
+}//end of change_Active
